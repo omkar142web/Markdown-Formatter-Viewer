@@ -1,1879 +1,2308 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Markdown Formatter &amp; Viewer</title>
 
     <!-- ===== CDN DEPENDENCIES ===== -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-theme" />
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
-    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+      id="hljs-theme"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <!-- ===== STYLES ===== -->
     <style>
-        /* ----- CSS Variables (Light default) ----- */
-        :root {
-            --bg-page: #f6f8fa;
-            --bg-content: #ffffff;
-            --bg-toolbar: #ffffff;
-            --bg-toc: #f6f8fa;
-            --bg-code: #f6f8fa;
-            --bg-code-block: #f6f8fa;
-            --bg-table-stripe: #f8f9fb;
-            --bg-blockquote: #f0f4ff;
-            --bg-upload: #f6f8fa;
-            --bg-upload-hover: #eef2f7;
+      /* ----- CSS Variables (Light default) ----- */
+      :root {
+        --bg-page: #f6f8fa;
+        --bg-content: #ffffff;
+        --bg-toolbar: #ffffff;
+        --bg-toc: #f6f8fa;
+        --bg-code: #f6f8fa;
+        --bg-code-block: #f6f8fa;
+        --bg-code-header: #f0f2f5;
+        --bg-table-stripe: #f8f9fb;
+        --bg-blockquote: #f0f4ff;
+        --bg-upload: #f6f8fa;
+        --bg-upload-hover: #eef2f7;
 
-            --text-primary: #1f2937;
-            --text-secondary: #4b5563;
-            --text-muted: #9ca3af;
-            --text-heading: #0f172a;
-            --text-link: #2563eb;
-            --text-link-hover: #1d4ed8;
-            --text-code: #d63384;
-            --text-code-block: #1f2937;
+        --text-primary: #1f2937;
+        --text-secondary: #4b5563;
+        --text-muted: #9ca3af;
+        --text-heading: #0f172a;
+        --text-link: #2563eb;
+        --text-link-hover: #1d4ed8;
+        --text-code: #d63384;
+        --text-code-block: #1f2937;
+        --text-success: #16a34a;
+        --text-danger: #dc2626;
 
-            --border-color: #e5e7eb;
-            --border-focus: #2563eb;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --border-color: #e5e7eb;
+        --border-focus: #2563eb;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
 
-            --radius: 8px;
-            --radius-lg: 12px;
-            --transition: 0.2s ease;
+        --radius: 8px;
+        --radius-lg: 12px;
+        --transition: 0.2s ease;
 
-            --max-width: 820px;
-            --toc-width: 260px;
-            --toolbar-height: 52px;
+        --max-width: 820px;
+        --toc-width: 260px;
+        --toolbar-height: 52px;
 
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            --font-mono: "SF Mono", "Cascadia Code", "Consolas", "Liberation Mono", monospace;
-        }
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 24px;
+        --space-6: 32px;
 
-        /* ----- Dark Mode ----- */
-        [data-theme="dark"] {
-            --bg-page: #0d1117;
-            --bg-content: #161b22;
-            --bg-toolbar: #161b22;
-            --bg-toc: #0d1117;
-            --bg-code: #1c2333;
-            --bg-code-block: #1c2333;
-            --bg-table-stripe: #1c2333;
-            --bg-blockquote: #1c2333;
-            --bg-upload: #161b22;
-            --bg-upload-hover: #1c2333;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        --font-mono:
+          "SF Mono", "Cascadia Code", "Consolas", "Liberation Mono", monospace;
+      }
 
-            --text-primary: #e6edf3;
-            --text-secondary: #8b949e;
-            --text-muted: #484f58;
-            --text-heading: #f0f6fc;
-            --text-link: #58a6ff;
-            --text-link-hover: #79c0ff;
-            --text-code: #f0888e;
-            --text-code-block: #e6edf3;
+      /* ----- Dark Mode ----- */
+      [data-theme="dark"] {
+        --bg-page: #0d1117;
+        --bg-content: #161b22;
+        --bg-toolbar: #161b22;
+        --bg-toc: #0d1117;
+        --bg-code: #1c2333;
+        --bg-code-block: #1c2333;
+        --bg-code-header: #1c2333;
+        --bg-table-stripe: #1c2333;
+        --bg-blockquote: #1c2333;
+        --bg-upload: #161b22;
+        --bg-upload-hover: #1c2333;
 
-            --border-color: #30363d;
-            --border-focus: #58a6ff;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
-        }
+        --text-primary: #e6edf3;
+        --text-secondary: #8b949e;
+        --text-muted: #484f58;
+        --text-heading: #f0f6fc;
+        --text-link: #58a6ff;
+        --text-link-hover: #79c0ff;
+        --text-code: #f0888e;
+        --text-code-block: #e6edf3;
+        --text-success: #3fb950;
+        --text-danger: #f85149;
 
-        /* ----- Reset & Base ----- */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        --border-color: #30363d;
+        --border-focus: #58a6ff;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+      }
 
-        html {
-            scroll-behavior: smooth;
-        }
+      /* ----- Reset & Base ----- */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-        body {
-            font-family: var(--font-sans);
-            background: var(--bg-page);
-            color: var(--text-primary);
-            transition: background var(--transition), color var(--transition);
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
+      body {
+        font-family: var(--font-sans);
+        background: var(--bg-page);
+        color: var(--text-primary);
+        transition:
+          background var(--transition),
+          color var(--transition);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
 
-        /* ----- Scrollbar ----- */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-page);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--text-muted);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
-        }
+      button {
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        /* ----- Empty State ----- */
-        #empty-state {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 24px;
-        }
+      :focus-visible {
+        outline: 2px solid var(--border-focus);
+        outline-offset: 2px;
+      }
 
-        .empty-container {
-            text-align: center;
-            max-width: 520px;
-            width: 100%;
-            padding: 48px 32px;
-            background: var(--bg-content);
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius-lg);
-            transition: background var(--transition), border-color var(--transition);
-            position: relative;
-        }
+      /* ----- Scrollbar ----- */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-page);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--text-muted);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+      }
 
-        .empty-container.dragover {
-            border-color: var(--border-focus);
-            background: var(--bg-upload-hover);
-        }
+      /* ----- Empty State ----- */
+      #empty-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: var(--space-5);
+      }
 
-        .empty-icon {
-            font-size: 56px;
-            line-height: 1;
-            margin-bottom: 16px;
-            display: block;
-        }
+      .empty-container {
+        text-align: center;
+        max-width: 520px;
+        width: 100%;
+        padding: 48px 32px;
+        background: var(--bg-content);
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius-lg);
+        transition:
+          background var(--transition),
+          border-color var(--transition);
+        position: relative;
+      }
 
-        .empty-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-heading);
-            margin-bottom: 6px;
-        }
+      .empty-container.dragover {
+        border-color: var(--border-focus);
+        background: var(--bg-upload-hover);
+      }
 
-        .empty-sub {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
+      .empty-container.invalid {
+        border-color: var(--text-danger);
+        background: var(--bg-upload);
+      }
 
-        .empty-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
+      .empty-icon {
+        font-size: 56px;
+        line-height: 1;
+        margin-bottom: var(--space-4);
+        display: block;
+      }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 24px;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: var(--font-sans);
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-            background: var(--bg-upload);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            text-decoration: none;
-            user-select: none;
-        }
+      .empty-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-heading);
+        margin-bottom: 6px;
+      }
 
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
+      .empty-sub {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+      }
 
-        .btn-primary {
-            background: var(--border-focus);
-            color: #fff;
-            border-color: var(--border-focus);
-        }
-        .btn-primary:hover {
-            background: var(--text-link-hover);
-            border-color: var(--text-link-hover);
-        }
+      .empty-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-3);
+      }
 
-        .btn-secondary {
-            background: var(--bg-content);
-            color: var(--text-primary);
-            border-color: var(--border-color);
-        }
-        .btn-secondary:hover {
-            background: var(--bg-upload-hover);
-        }
+      .drop-hint {
+        margin-top: var(--space-4);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-link);
+        min-height: 18px;
+      }
+      .empty-container.invalid .drop-hint {
+        color: var(--text-danger);
+      }
 
-        .btn-small {
-            padding: 6px 14px;
-            font-size: 12px;
-        }
+      .empty-hint {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: var(--space-4);
+      }
 
-        .btn-icon {
-            padding: 8px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            color: var(--text-secondary);
-            transition: background var(--transition), color var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-icon:hover {
-            background: var(--bg-upload-hover);
-            color: var(--text-primary);
-        }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        height: 40px;
+        padding: 0 24px;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: var(--font-sans);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition:
+          background var(--transition),
+          transform var(--transition),
+          box-shadow var(--transition);
+        background: var(--bg-upload);
+        color: var(--text-primary);
+        text-decoration: none;
+        user-select: none;
+      }
 
-        .file-info {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 12px;
-        }
-        .file-info strong {
-            color: var(--text-primary);
-        }
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
 
-        .empty-hint {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 16px;
-        }
+      .btn-primary {
+        background: var(--border-focus);
+        color: #fff;
+        border-color: var(--border-focus);
+      }
+      .btn-primary:hover {
+        background: var(--text-link-hover);
+        border-color: var(--text-link-hover);
+      }
 
-        /* ----- Hidden file input ----- */
-        #file-input {
-            display: none;
-        }
+      .btn-secondary {
+        background: var(--bg-content);
+        color: var(--text-primary);
+        border-color: var(--border-color);
+      }
+      .btn-secondary:hover {
+        background: var(--bg-upload-hover);
+      }
 
-        /* ----- App (hidden until file loaded) ----- */
-        #app {
-            display: none;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        #app.visible {
-            display: flex;
-        }
+      .btn-icon {
+        padding: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: var(--text-secondary);
+        transition:
+          background var(--transition),
+          color var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .btn-icon:hover {
+        background: var(--bg-upload-hover);
+        color: var(--text-primary);
+      }
+      .btn-icon:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .btn-icon svg {
+        display: block;
+      }
 
-        /* ----- Toolbar ----- */
-        #toolbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg-toolbar);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0 20px;
-            height: var(--toolbar-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-shrink: 0;
-            transition: background var(--transition), border-color var(--transition);
-            backdrop-filter: blur(8px);
-            background: rgba(var(--bg-toolbar-rgb, 255, 255, 255), 0.92);
-        }
-        [data-theme="dark"] #toolbar {
-            background: rgba(22, 27, 34, 0.92);
-        }
+      /* ----- Hidden file inputs ----- */
+      #file-input,
+      #file-input-toolbar {
+        display: none;
+      }
 
-        .toolbar-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-            flex: 1;
+      /* ----- App (hidden until file loaded) ----- */
+      #app {
+        display: none;
+        flex-direction: column;
+        height: 100vh;
+      }
+      #app.visible {
+        display: flex;
+      }
+      #app.loading {
+        cursor: progress;
+      }
+
+      /* ----- Toolbar ----- */
+      #toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg-toolbar);
+        border-bottom: 1px solid var(--border-color);
+        padding: 0 20px;
+        height: var(--toolbar-height);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        flex-shrink: 0;
+        transition:
+          background var(--transition),
+          border-color var(--transition);
+      }
+
+      .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        min-width: 0;
+        flex: 1;
+      }
+      .toolbar-left .file-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .toolbar-left .file-name {
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--text-heading);
+        max-width: 320px;
+      }
+      .toolbar-left .file-stats {
+        font-size: 12px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .toolbar-left .file-stats span {
+        margin: 0 4px;
+      }
+      .toolbar-left .file-stats .sep {
+        color: var(--text-muted);
+      }
+
+      .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-1);
+        flex-shrink: 0;
+      }
+
+      .toolbar-right .btn-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      /* ----- Reading Progress ----- */
+      #progress-bar {
+        position: fixed;
+        top: var(--toolbar-height);
+        left: 0;
+        height: 3px;
+        background: var(--border-focus);
+        width: 0%;
+        z-index: 99;
+        transition: width 0.1s ease;
+        border-radius: 0 2px 2px 0;
+        box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
+      }
+
+      /* ----- Main Layout ----- */
+      #main {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        position: relative;
+      }
+
+      /* ----- TOC ----- */
+      #toc {
+        width: var(--toc-width);
+        background: var(--bg-toc);
+        border-right: 1px solid var(--border-color);
+        padding: 20px 16px;
+        overflow-y: auto;
+        flex-shrink: 0;
+        height: calc(100vh - var(--toolbar-height));
+        position: sticky;
+        top: var(--toolbar-height);
+        transition:
+          background var(--transition),
+          border-color var(--transition),
+          transform 0.3s ease;
+      }
+      #toc .toc-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+        padding-bottom: var(--space-2);
+        border-bottom: 1px solid var(--border-color);
+      }
+      #toc .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      #toc .toc-list ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      #toc .toc-list li {
+        margin: 0;
+        padding: 0;
+      }
+      #toc .toc-list a {
+        display: block;
+        padding: var(--space-1) var(--space-2);
+        font-size: 13px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: 4px;
+        transition:
+          background var(--transition),
+          color var(--transition);
+        border-left: 2px solid transparent;
+        line-height: 1.4;
+      }
+      #toc .toc-list a:hover {
+        background: var(--bg-upload-hover);
+        color: var(--text-primary);
+      }
+      #toc .toc-list a.active {
+        color: var(--text-link);
+        border-left-color: var(--text-link);
+        background: var(--bg-upload-hover);
+      }
+      #toc .toc-list .level-2 {
+        padding-left: 20px;
+        font-size: 12.5px;
+      }
+      #toc .toc-list .level-3 {
+        padding-left: 36px;
+        font-size: 12px;
+      }
+      #toc .toc-list .level-4 {
+        padding-left: 52px;
+        font-size: 11.5px;
+      }
+      #toc .toc-list .level-5,
+      #toc .toc-list .level-6 {
+        padding-left: 68px;
+        font-size: 11px;
+      }
+      #toc .toc-empty {
+        padding: var(--space-2);
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      /* TOC toggle for mobile */
+      #toc-toggle {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 90;
+        background: var(--bg-content);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        transition:
+          background var(--transition),
+          transform var(--transition);
+        color: var(--text-primary);
+        align-items: center;
+        justify-content: center;
+      }
+      #toc-toggle:hover {
+        transform: scale(1.05);
+      }
+      #toc-toggle.active {
+        background: var(--border-focus);
+        color: #fff;
+        border-color: var(--border-focus);
+      }
+      #toc-toggle svg {
+        display: block;
+      }
+
+      /* ----- Content (document scroll container) ----- */
+      #content {
+        flex: 1;
+        padding: 40px 32px 80px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        background: var(--bg-content);
+        transition: background var(--transition);
+        min-width: 0;
+        max-width: calc(100% - var(--toc-width));
+      }
+      #content .content-inner {
+        max-width: var(--max-width);
+        margin: 0 auto;
+      }
+
+      /* ----- Document Typography ----- */
+      #content h1,
+      #content h2,
+      #content h3,
+      #content h4,
+      #content h5,
+      #content h6 {
+        color: var(--text-heading);
+        margin-top: 1.8em;
+        margin-bottom: 0.5em;
+        font-weight: 700;
+        line-height: 1.3;
+        scroll-margin-top: calc(var(--toolbar-height) + 16px);
+        transition: color var(--transition);
+      }
+      #content h1 {
+        font-size: 2.2em;
+        margin-top: 0;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.3em;
+      }
+      #content h2 {
+        font-size: 1.7em;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.25em;
+      }
+      #content h3 {
+        font-size: 1.35em;
+      }
+      #content h4 {
+        font-size: 1.15em;
+      }
+      #content h5 {
+        font-size: 1em;
+      }
+      #content h6 {
+        font-size: 0.9em;
+        color: var(--text-secondary);
+      }
+
+      #content p {
+        margin: 0 0 1.2em 0;
+        line-height: 1.7;
+        color: var(--text-primary);
+      }
+
+      #content a {
+        color: var(--text-link);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition:
+          color var(--transition),
+          border-color var(--transition);
+      }
+      #content a:hover {
+        color: var(--text-link-hover);
+        border-bottom-color: var(--text-link-hover);
+      }
+
+      #content strong {
+        font-weight: 700;
+        color: var(--text-heading);
+      }
+      #content em {
+        font-style: italic;
+      }
+      #content del {
+        text-decoration: line-through;
+        color: var(--text-secondary);
+      }
+
+      /* Inline code */
+      #content code:not(pre code) {
+        font-family: var(--font-mono);
+        font-size: 0.9em;
+        padding: 0.2em 0.5em;
+        background: var(--bg-code);
+        border-radius: 4px;
+        color: var(--text-code);
+        border: 1px solid var(--border-color);
+        white-space: nowrap;
+        transition:
+          background var(--transition),
+          color var(--transition),
+          border-color var(--transition);
+      }
+
+      /* Code blocks */
+      #content pre {
+        margin: 1.2em 0;
+        border-radius: var(--radius);
+        background: var(--bg-code-block);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        transition:
+          background var(--transition),
+          border-color var(--transition);
+      }
+      #content pre code {
+        display: block;
+        padding: 16px 20px;
+        font-family: var(--font-mono);
+        font-size: 13.5px;
+        line-height: 1.65;
+        overflow-x: auto;
+        white-space: pre;
+        color: var(--text-code-block);
+        tab-size: 2;
+      }
+
+      /* Code block header (language + copy) */
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-2) var(--space-4);
+        background: var(--bg-code-header);
+        border-bottom: 1px solid var(--border-color);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        transition:
+          background var(--transition),
+          border-color var(--transition);
+        font-family: var(--font-sans);
+      }
+      .code-header .lang {
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-size: 11px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .code-header .copy-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--text-secondary);
+        padding: 4px 10px;
+        border-radius: 4px;
+        transition:
+          background var(--transition),
+          color var(--transition);
+        font-family: var(--font-sans);
+        min-height: 28px;
+      }
+      .code-header .copy-btn:hover {
+        background: var(--bg-upload-hover);
+        color: var(--text-primary);
+      }
+      .code-header .copy-btn.copied {
+        color: var(--text-success);
+      }
+
+      /* ----- Lists ----- */
+      #content ul,
+      #content ol {
+        margin: 0 0 1.2em 0;
+        padding-left: 1.8em;
+        line-height: 1.7;
+      }
+      #content ul ul,
+      #content ol ol,
+      #content ul ol,
+      #content ol ul {
+        margin-bottom: 0.4em;
+      }
+      #content li {
+        margin-bottom: 0.2em;
+      }
+      #content li > p {
+        margin-bottom: 0.2em;
+      }
+
+      /* Checkboxes */
+      #content .task-list-item {
+        list-style: none;
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-2);
+        padding-left: 0;
+      }
+      #content .task-list-item input[type="checkbox"] {
+        margin-top: 4px;
+        width: 16px;
+        height: 16px;
+        accent-color: var(--border-focus);
+        cursor: default;
+        flex-shrink: 0;
+      }
+      #content ul .task-list-item {
+        margin-left: -1.8em;
+      }
+
+      /* ----- Blockquotes ----- */
+      #content blockquote {
+        margin: 1.2em 0;
+        padding: 12px 20px;
+        background: var(--bg-blockquote);
+        border-left: 4px solid var(--text-link);
+        border-radius: 0 var(--radius) var(--radius) 0;
+        color: var(--text-secondary);
+        transition:
+          background var(--transition),
+          border-color var(--transition);
+      }
+      #content blockquote p:last-child {
+        margin-bottom: 0;
+      }
+      #content blockquote code:not(pre code) {
+        background: var(--bg-code);
+      }
+
+      /* ----- Horizontal Rules ----- */
+      #content hr {
+        border: none;
+        height: 1px;
+        background: var(--border-color);
+        margin: 2.4em 0;
+        transition: background var(--transition);
+      }
+
+      /* ----- Images ----- */
+      #content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        margin: 0.8em 0;
+      }
+      #content img.broken {
+        border-style: dashed;
+        opacity: 0.7;
+        min-height: 48px;
+        padding: var(--space-4);
+      }
+
+      /* ----- Tables ----- */
+      #content .table-wrapper {
+        overflow-x: auto;
+        margin: 1.2em 0;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        transition: border-color var(--transition);
+      }
+      #content table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        min-width: 480px;
+      }
+      #content table th {
+        background: var(--bg-upload);
+        font-weight: 700;
+        color: var(--text-heading);
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 2px solid var(--border-color);
+        transition:
+          background var(--transition),
+          border-color var(--transition);
+      }
+      #content table td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border-color);
+        transition: border-color var(--transition);
+      }
+      #content table tr:last-child td {
+        border-bottom: none;
+      }
+      #content table tbody tr:nth-child(even) {
+        background: var(--bg-table-stripe);
+      }
+      #content table tbody tr:hover {
+        background: var(--bg-upload-hover);
+      }
+
+      /* ----- Back to Top ----- */
+      #back-to-top {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--bg-content);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
+        cursor: pointer;
+        font-size: 20px;
+        color: var(--text-secondary);
+        transition:
+          opacity var(--transition),
+          transform var(--transition),
+          background var(--transition);
+        opacity: 0;
+        transform: translateY(12px);
+        pointer-events: none;
+        z-index: 80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #back-to-top.visible {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+      #back-to-top:hover {
+        background: var(--bg-upload-hover);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+      }
+      #back-to-top svg {
+        display: block;
+      }
+
+      /* ----- Error toast ----- */
+      .toast {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg-content);
+        color: var(--text-primary);
+        padding: 12px 24px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
+        font-size: 14px;
+        z-index: 200;
+        max-width: 90%;
+        opacity: 0;
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        pointer-events: auto;
+      }
+      .toast.error {
+        border-left: 4px solid var(--text-danger);
+      }
+      .toast.success {
+        border-left: 4px solid var(--text-success);
+      }
+      .toast .toast-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+
+      /* ----- TOC overlay for mobile ----- */
+      #toc-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 45;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+      }
+      #toc-overlay.visible {
+        display: block;
+      }
+
+      /* Lock document scroll while the mobile drawer is open */
+      #app.toc-open #content {
+        overflow: hidden;
+      }
+
+      /* ----- Responsive ----- */
+      @media (max-width: 1024px) {
+        #toc {
+          width: 220px;
         }
-        .toolbar-left .file-icon {
-            font-size: 18px;
-            flex-shrink: 0;
+        #content {
+          max-width: calc(100% - 220px);
         }
-        .toolbar-left .file-name {
-            font-weight: 600;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: var(--text-heading);
+      }
+
+      @media (max-width: 820px) {
+        #toc {
+          position: fixed;
+          top: var(--toolbar-height);
+          left: 0;
+          bottom: 0;
+          width: 280px;
+          transform: translateX(-100%);
+          z-index: 50;
+          height: calc(100vh - var(--toolbar-height));
+          box-shadow: var(--shadow-lg);
+          border-right: 1px solid var(--border-color);
+          background: var(--bg-content);
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #toc.open {
+          transform: translateX(0);
+        }
+        #toc-toggle {
+          display: flex;
+        }
+        #content {
+          max-width: 100%;
+          padding: 24px 20px 80px;
         }
         .toolbar-left .file-stats {
-            font-size: 12px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+          display: none;
         }
-        .toolbar-left .file-stats span {
-            margin: 0 4px;
+        @media (min-width: 821px) {
+          #toc-overlay {
+            display: none !important;
+          }
         }
-        .toolbar-left .file-stats .sep {
-            color: var(--text-muted);
-        }
+      }
 
+      @media (max-width: 600px) {
+        #toolbar {
+          padding: 0 10px;
+          gap: var(--space-2);
+        }
+        .toolbar-left {
+          gap: var(--space-2);
+        }
+        .toolbar-left .file-name {
+          font-size: 13px;
+          max-width: 130px;
+        }
         .toolbar-right {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-shrink: 0;
+          gap: 2px;
         }
-
         .toolbar-right .btn-icon {
-            font-size: 16px;
-            width: 32px;
-            height: 32px;
+          width: 40px;
+          height: 40px;
         }
-
-        /* ----- Reading Progress ----- */
-        #progress-bar {
-            position: fixed;
-            top: var(--toolbar-height);
-            left: 0;
-            height: 3px;
-            background: var(--border-focus);
-            width: 0%;
-            z-index: 99;
-            transition: width 0.1s ease;
-            border-radius: 0 2px 2px 0;
-            box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
-        }
-
-        /* ----- Main Layout ----- */
-        #main {
-            display: flex;
-            flex: 1;
-            min-height: 0;
-            position: relative;
-        }
-
-        /* ----- TOC ----- */
-        #toc {
-            width: var(--toc-width);
-            background: var(--bg-toc);
-            border-right: 1px solid var(--border-color);
-            padding: 20px 16px;
-            overflow-y: auto;
-            flex-shrink: 0;
-            height: calc(100vh - var(--toolbar-height));
-            position: sticky;
-            top: var(--toolbar-height);
-            transition: background var(--transition), border-color var(--transition), transform 0.3s ease;
-        }
-        #toc .toc-title {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: var(--text-muted);
-            margin-bottom: 14px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        #toc .toc-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        #toc .toc-list li {
-            margin: 0;
-            padding: 0;
-        }
-        #toc .toc-list a {
-            display: block;
-            padding: 4px 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background var(--transition), color var(--transition);
-            border-left: 2px solid transparent;
-            line-height: 1.4;
-        }
-        #toc .toc-list a:hover {
-            background: var(--bg-upload-hover);
-            color: var(--text-primary);
-        }
-        #toc .toc-list a.active {
-            color: var(--text-link);
-            border-left-color: var(--text-link);
-            background: var(--bg-upload-hover);
-        }
-        #toc .toc-list .level-2 {
-            padding-left: 20px;
-            font-size: 12.5px;
-        }
-        #toc .toc-list .level-3 {
-            padding-left: 36px;
-            font-size: 12px;
-        }
-        #toc .toc-list .level-4 {
-            padding-left: 52px;
-            font-size: 11.5px;
-        }
-        #toc .toc-list .level-5,
-        #toc .toc-list .level-6 {
-            padding-left: 68px;
-            font-size: 11px;
-        }
-
-        /* TOC toggle for mobile */
-        #toc-toggle {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 90;
-            background: var(--bg-content);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: var(--shadow-md);
-            transition: background var(--transition), transform var(--transition);
-            color: var(--text-primary);
-            align-items: center;
-            justify-content: center;
-        }
-        #toc-toggle:hover {
-            transform: scale(1.05);
-        }
-        #toc-toggle.active {
-            background: var(--border-focus);
-            color: #fff;
-            border-color: var(--border-focus);
-        }
-
-        /* ----- Content ----- */
         #content {
-            flex: 1;
-            padding: 40px 32px 80px;
-            overflow-y: auto;
-            background: var(--bg-content);
-            transition: background var(--transition);
-            min-width: 0;
-            max-width: calc(100% - var(--toc-width));
+          padding: 16px 16px 80px;
         }
-        #content .content-inner {
-            max-width: var(--max-width);
-            margin: 0 auto;
+        #content h1 {
+          font-size: 1.7em;
         }
+        #content h2 {
+          font-size: 1.4em;
+        }
+        #content h3 {
+          font-size: 1.2em;
+        }
+        #content pre code {
+          font-size: 12px;
+          padding: 12px 14px;
+        }
+        .empty-container {
+          padding: var(--space-6) 20px;
+        }
+        .empty-title {
+          font-size: 18px;
+        }
+        #toc {
+          width: 260px;
+        }
+        #back-to-top {
+          width: 44px;
+          height: 44px;
+          bottom: 16px;
+          right: 16px;
+        }
+        #toc-toggle {
+          width: 44px;
+          height: 44px;
+          bottom: 16px;
+          left: 16px;
+        }
+        .toast {
+          bottom: 78px;
+          max-width: calc(100% - 150px);
+          font-size: 13px;
+          padding: 10px 14px;
+        }
+      }
 
-        /* ----- Document Typography ----- */
+      @media (max-width: 420px) {
+        .toolbar-left .file-icon {
+          display: none;
+        }
+        .toolbar-left .file-name {
+          max-width: 88px;
+        }
+        #content {
+          padding: 12px 12px 70px;
+        }
+        #content table {
+          font-size: 12px;
+          min-width: 320px;
+        }
+        #content table th,
+        #content table td {
+          padding: 6px 10px;
+        }
+        #toc {
+          width: 240px;
+        }
+        #back-to-top {
+          width: 40px;
+          height: 40px;
+        }
+        #toc-toggle {
+          width: 40px;
+          height: 40px;
+        }
+      }
+
+      /* ----- Print Styles ----- */
+      @media print {
+        #toolbar,
+        #toc,
+        #toc-toggle,
+        #toc-overlay,
+        #back-to-top,
+        #progress-bar,
+        .code-header .copy-btn,
+        .no-print {
+          display: none !important;
+        }
+        #app {
+          display: block !important;
+          height: auto !important;
+        }
+        #app.toc-open #content {
+          overflow: visible !important;
+        }
+        #content {
+          padding: 20px 40px !important;
+          max-width: 100% !important;
+          overflow: visible !important;
+          max-height: none !important;
+          background: #fff !important;
+          color: #000 !important;
+        }
         #content h1,
         #content h2,
         #content h3,
         #content h4,
         #content h5,
         #content h6 {
-            color: var(--text-heading);
-            margin-top: 1.8em;
-            margin-bottom: 0.5em;
-            font-weight: 700;
-            line-height: 1.3;
-            scroll-margin-top: calc(var(--toolbar-height) + 16px);
-            transition: color var(--transition);
+          color: #000 !important;
         }
-        #content h1 {
-            font-size: 2.2em;
-            margin-top: 0;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.3em;
-        }
-        #content h2 {
-            font-size: 1.7em;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.25em;
-        }
-        #content h3 {
-            font-size: 1.35em;
-        }
-        #content h4 {
-            font-size: 1.15em;
-        }
-        #content h5 {
-            font-size: 1em;
-        }
-        #content h6 {
-            font-size: 0.9em;
-            color: var(--text-secondary);
-        }
-
-        #content p {
-            margin: 0 0 1.2em 0;
-            line-height: 1.7;
-            color: var(--text-primary);
-        }
-
         #content a {
-            color: var(--text-link);
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: color var(--transition), border-color var(--transition);
+          color: #000 !important;
+          border-bottom: 1px solid #000 !important;
         }
-        #content a:hover {
-            color: var(--text-link-hover);
-            border-bottom-color: var(--text-link-hover);
-        }
-
-        #content strong {
-            font-weight: 700;
-            color: var(--text-heading);
-        }
-        #content em {
-            font-style: italic;
-        }
-        #content del {
-            text-decoration: line-through;
-            color: var(--text-secondary);
-        }
-
-        /* Inline code */
-        #content code:not(pre code) {
-            font-family: var(--font-mono);
-            font-size: 0.9em;
-            padding: 0.2em 0.5em;
-            background: var(--bg-code);
-            border-radius: 4px;
-            color: var(--text-code);
-            border: 1px solid var(--border-color);
-            white-space: nowrap;
-            transition: background var(--transition), color var(--transition), border-color var(--transition);
-        }
-
-        /* Code blocks */
         #content pre {
-            margin: 1.2em 0;
-            border-radius: var(--radius);
-            background: var(--bg-code-block);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            transition: background var(--transition), border-color var(--transition);
-            position: relative;
+          background: #f5f5f5 !important;
+          border: 1px solid #ddd !important;
+          break-inside: avoid;
         }
-        #content pre code {
-            display: block;
-            padding: 16px 20px;
-            font-family: var(--font-mono);
-            font-size: 13.5px;
-            line-height: 1.65;
-            overflow-x: auto;
-            color: var(--text-code-block);
-            tab-size: 2;
-        }
-
-        /* Code block header (language + copy) */
-        .code-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 16px;
-            background: var(--bg-upload);
-            border-bottom: 1px solid var(--border-color);
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            transition: background var(--transition), border-color var(--transition);
-            font-family: var(--font-sans);
-        }
-        .code-header .lang {
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            font-size: 11px;
-        }
-        .code-header .copy-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 12px;
-            color: var(--text-secondary);
-            padding: 4px 10px;
-            border-radius: 4px;
-            transition: background var(--transition), color var(--transition);
-            font-family: var(--font-sans);
-        }
-        .code-header .copy-btn:hover {
-            background: var(--bg-upload-hover);
-            color: var(--text-primary);
-        }
-        .code-header .copy-btn.copied {
-            color: #22c55e;
-        }
-
-        /* ----- Lists ----- */
-        #content ul,
-        #content ol {
-            margin: 0 0 1.2em 0;
-            padding-left: 1.8em;
-            line-height: 1.7;
-        }
-        #content ul ul,
-        #content ol ol,
-        #content ul ol,
-        #content ol ul {
-            margin-bottom: 0.4em;
-        }
-        #content li {
-            margin-bottom: 0.2em;
-        }
-        #content li > p {
-            margin-bottom: 0.2em;
-        }
-
-        /* Checkboxes */
-        #content .task-list-item {
-            list-style: none;
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            padding-left: 0;
-        }
-        #content .task-list-item input[type="checkbox"] {
-            margin-top: 4px;
-            width: 16px;
-            height: 16px;
-            accent-color: var(--border-focus);
-            cursor: default;
-            flex-shrink: 0;
-        }
-        #content ul .task-list-item {
-            margin-left: -1.8em;
-        }
-
-        /* ----- Blockquotes ----- */
-        #content blockquote {
-            margin: 1.2em 0;
-            padding: 12px 20px;
-            background: var(--bg-blockquote);
-            border-left: 4px solid var(--text-link);
-            border-radius: 0 var(--radius) var(--radius) 0;
-            color: var(--text-secondary);
-            transition: background var(--transition), border-color var(--transition);
-        }
-        #content blockquote p:last-child {
-            margin-bottom: 0;
-        }
-        #content blockquote code:not(pre code) {
-            background: var(--bg-code);
-        }
-
-        /* ----- Horizontal Rules ----- */
-        #content hr {
-            border: none;
-            height: 1px;
-            background: var(--border-color);
-            margin: 2.4em 0;
-            transition: background var(--transition);
-        }
-
-        /* ----- Images ----- */
-        #content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            margin: 0.8em 0;
-        }
-
-        /* ----- Tables ----- */
-        #content .table-wrapper {
-            overflow-x: auto;
-            margin: 1.2em 0;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            transition: border-color var(--transition);
-        }
-        #content table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            min-width: 400px;
+        #content code:not(pre code) {
+          background: #f5f5f5 !important;
+          border: 1px solid #ddd !important;
+          color: #d63384 !important;
         }
         #content table th {
-            background: var(--bg-upload);
-            font-weight: 700;
-            color: var(--text-heading);
-            padding: 10px 14px;
-            text-align: left;
-            border-bottom: 2px solid var(--border-color);
-            transition: background var(--transition), border-color var(--transition);
+          background: #f0f0f0 !important;
         }
         #content table td {
-            padding: 9px 14px;
-            border-bottom: 1px solid var(--border-color);
-            transition: border-color var(--transition);
+          border-bottom: 1px solid #ddd !important;
         }
-        #content table tr:last-child td {
-            border-bottom: none;
+        #content blockquote {
+          background: #f8f8f8 !important;
+          border-left-color: #333 !important;
+          break-inside: avoid;
         }
-        #content table tbody tr:nth-child(even) {
-            background: var(--bg-table-stripe);
+        #content .table-wrapper {
+          border: 1px solid #ddd !important;
+          break-inside: avoid;
         }
-        #content table tbody tr:hover {
-            background: var(--bg-upload-hover);
+        #content img {
+          border: 1px solid #ddd !important;
+          break-inside: avoid;
         }
+        #content tr {
+          break-inside: avoid;
+        }
+        body {
+          background: #fff !important;
+        }
+        #content .task-list-item input[type="checkbox"] {
+          accent-color: #000 !important;
+        }
+        .code-header {
+          background: #f0f0f0 !important;
+          border-bottom: 1px solid #ddd !important;
+        }
+        .code-header .lang {
+          color: #555 !important;
+        }
+        #main {
+          display: block !important;
+        }
+        #empty-state {
+          display: none !important;
+        }
+        #app.visible {
+          display: block !important;
+        }
+      }
 
-        /* ----- Back to Top ----- */
-        #back-to-top {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--bg-content);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--text-secondary);
-            transition: opacity var(--transition), transform var(--transition), background var(--transition);
-            opacity: 0;
-            transform: translateY(12px);
-            pointer-events: none;
-            z-index: 80;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #back-to-top.visible {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-        #back-to-top:hover {
-            background: var(--bg-upload-hover);
-            color: var(--text-primary);
-            transform: translateY(-2px);
-        }
-
-        /* ----- Print Styles ----- */
-        @media print {
-            #toolbar,
-            #toc,
-            #toc-toggle,
-            #back-to-top,
-            #progress-bar,
-            .code-header .copy-btn,
-            .no-print {
-                display: none !important;
-            }
-            #app {
-                display: block !important;
-            }
-            #content {
-                padding: 20px 40px !important;
-                max-width: 100% !important;
-                background: #fff !important;
-                color: #000 !important;
-            }
-            #content h1,
-            #content h2,
-            #content h3,
-            #content h4,
-            #content h5,
-            #content h6 {
-                color: #000 !important;
-            }
-            #content a {
-                color: #000 !important;
-                border-bottom: 1px solid #000 !important;
-            }
-            #content pre {
-                background: #f5f5f5 !important;
-                border: 1px solid #ddd !important;
-            }
-            #content code:not(pre code) {
-                background: #f5f5f5 !important;
-                border: 1px solid #ddd !important;
-                color: #d63384 !important;
-            }
-            #content table th {
-                background: #f0f0f0 !important;
-            }
-            #content table td {
-                border-bottom: 1px solid #ddd !important;
-            }
-            #content blockquote {
-                background: #f8f8f8 !important;
-                border-left-color: #333 !important;
-            }
-            #content .table-wrapper {
-                border: 1px solid #ddd !important;
-            }
-            #content img {
-                border: 1px solid #ddd !important;
-            }
-            body {
-                background: #fff !important;
-            }
-            #content .task-list-item input[type="checkbox"] {
-                accent-color: #000 !important;
-            }
-            .code-header {
-                background: #f0f0f0 !important;
-                border-bottom: 1px solid #ddd !important;
-            }
-            .code-header .lang {
-                color: #555 !important;
-            }
-            #main {
-                display: block !important;
-            }
-            #toc {
-                display: none !important;
-            }
-            #empty-state {
-                display: none !important;
-            }
-            #app.visible {
-                display: block !important;
-            }
-        }
-
-        /* ----- Responsive ----- */
-        @media (max-width: 1024px) {
-            #toc {
-                width: 220px;
-            }
-            #content {
-                max-width: calc(100% - 220px);
-            }
-        }
-
-        @media (max-width: 820px) {
-            #toc {
-                position: fixed;
-                top: var(--toolbar-height);
-                left: 0;
-                bottom: 0;
-                width: 280px;
-                transform: translateX(-100%);
-                z-index: 50;
-                height: calc(100vh - var(--toolbar-height));
-                box-shadow: var(--shadow-lg);
-                border-right: 1px solid var(--border-color);
-                background: var(--bg-content);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            #toc.open {
-                transform: translateX(0);
-            }
-            #toc-toggle {
-                display: flex;
-            }
-            #content {
-                max-width: 100%;
-                padding: 24px 20px 80px;
-            }
-            .toolbar-left .file-stats {
-                display: none;
-            }
-        }
-
-        @media (max-width: 600px) {
-            #toolbar {
-                padding: 0 12px;
-                gap: 8px;
-            }
-            .toolbar-left .file-name {
-                font-size: 13px;
-                max-width: 120px;
-            }
-            .toolbar-right .btn-icon {
-                width: 28px;
-                height: 28px;
-                font-size: 14px;
-            }
-            #content {
-                padding: 16px 14px 80px;
-            }
-            #content h1 {
-                font-size: 1.7em;
-            }
-            #content h2 {
-                font-size: 1.4em;
-            }
-            #content h3 {
-                font-size: 1.2em;
-            }
-            #content pre code {
-                font-size: 12px;
-                padding: 12px 14px;
-            }
-            .empty-container {
-                padding: 32px 20px;
-            }
-            .empty-title {
-                font-size: 18px;
-            }
-            #toc {
-                width: 260px;
-            }
-            #back-to-top {
-                width: 38px;
-                height: 38px;
-                font-size: 16px;
-                bottom: 16px;
-                right: 16px;
-            }
-            #toc-toggle {
-                width: 42px;
-                height: 42px;
-                font-size: 18px;
-                bottom: 16px;
-                left: 16px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .toolbar-left .file-stats {
-                display: none !important;
-            }
-            #content {
-                padding: 12px 10px 70px;
-            }
-            #content table {
-                font-size: 12px;
-                min-width: 300px;
-            }
-            #content table th,
-            #content table td {
-                padding: 6px 10px;
-            }
-        }
-
-        /* ----- Utility ----- */
-        .hidden {
-            display: none !important;
-        }
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            border: 0;
-        }
-
-        /* ----- Error toast ----- */
-        .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-content);
-            color: var(--text-primary);
-            padding: 12px 24px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-lg);
-            font-size: 14px;
-            z-index: 200;
-            max-width: 90%;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-            pointer-events: auto;
-        }
-        .toast.error {
-            border-left: 4px solid #ef4444;
-        }
-        .toast.success {
-            border-left: 4px solid #22c55e;
-        }
-        .toast .toast-icon {
-            font-size: 18px;
-        }
-
-        /* ----- TOC overlay for mobile ----- */
-        #toc-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 45;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(2px);
-        }
-        #toc-overlay.visible {
-            display: block;
-        }
-        @media (min-width: 821px) {
-            #toc-overlay {
-                display: none !important;
-            }
-        }
-
-        /* ----- Code block line numbers (simple) ----- */
-        .hljs-ln {
-            border-collapse: collapse;
-            border-spacing: 0;
-            width: 100%;
-        }
-        .hljs-ln td {
-            padding: 0;
-            border: none;
-        }
-        .hljs-ln .hljs-ln-numbers {
-            padding-right: 16px;
-            text-align: right;
-            color: var(--text-muted);
-            font-size: 12px;
-            user-select: none;
-            width: 28px;
-            border-right: 1px solid var(--border-color);
-            opacity: 0.6;
-            font-variant-numeric: tabular-nums;
-        }
-        .hljs-ln .hljs-ln-code {
-            padding-left: 16px;
-        }
+      /* ----- Utility ----- */
+      .hidden {
+        display: none !important;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- ===== EMPTY STATE ===== -->
     <div id="empty-state">
-        <div class="empty-container" id="drop-zone">
-            <span class="empty-icon">📄</span>
-            <div class="empty-title">Markdown → Beautiful HTML</div>
-            <div class="empty-sub">Drop your Markdown file here</div>
-            <div class="empty-actions">
-                <button class="btn btn-primary" id="choose-file-btn">📁 Choose Markdown File</button>
-                <button class="btn btn-secondary" id="example-btn">✨ Try Example</button>
-            </div>
-            <div class="file-info" id="file-info"></div>
-            <div class="empty-hint">Supports .md and .markdown files</div>
-            <input type="file" id="file-input" accept=".md,.markdown" />
+      <div class="empty-container" id="drop-zone">
+        <span class="empty-icon">📄</span>
+        <div class="empty-title">Markdown → Beautiful HTML</div>
+        <div class="empty-sub">Drop your Markdown file here</div>
+        <div class="empty-actions">
+          <button class="btn btn-primary" id="choose-file-btn">
+            📁 Choose Markdown File
+          </button>
+          <button class="btn btn-secondary" id="example-btn">
+            ✨ Try Example
+          </button>
         </div>
+        <div class="drop-hint" id="drop-hint"></div>
+        <div class="empty-hint">
+          Supports .md and .markdown files · Downloaded HTML needs internet for
+          code highlighting
+        </div>
+        <input type="file" id="file-input" accept=".md,.markdown" />
+      </div>
     </div>
 
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast">
-        <span class="toast-icon">📌</span>
-        <span id="toast-message">Message</span>
+      <span class="toast-icon">📌</span>
+      <span id="toast-message">Message</span>
     </div>
 
     <!-- ===== APP ===== -->
     <div id="app">
-
-        <!-- Toolbar -->
-        <header id="toolbar">
-            <div class="toolbar-left">
-                <span class="file-icon">📄</span>
-                <span class="file-name" id="file-name-display">document.md</span>
-                <span class="file-stats" id="file-stats-display">
-                    <span id="stat-words">0</span> words
-                    <span class="sep">·</span>
-                    <span id="stat-headings">0</span> headings
-                    <span class="sep">·</span>
-                    <span id="stat-codeblocks">0</span> code blocks
-                    <span class="sep">·</span>
-                    <span id="stat-reading">~0 min</span>
-                </span>
-            </div>
-            <div class="toolbar-right">
-                <button class="btn-icon" id="theme-toggle" title="Toggle theme (Ctrl+Shift+D)">☀</button>
-                <button class="btn-icon" id="fullscreen-btn" title="Fullscreen">⛶</button>
-                <button class="btn-icon" id="download-btn" title="Download HTML">⬇</button>
-                <button class="btn-icon" id="reupload-btn" title="Upload another file">📂</button>
-                <input type="file" id="file-input-toolbar" accept=".md,.markdown" style="display:none" />
-            </div>
-        </header>
-
-        <!-- Progress Bar -->
-        <div id="progress-bar"></div>
-
-        <!-- Main -->
-        <div id="main">
-
-            <!-- TOC Overlay (mobile) -->
-            <div id="toc-overlay"></div>
-
-            <!-- TOC Sidebar -->
-            <nav id="toc" aria-label="Table of Contents">
-                <div class="toc-title">Contents</div>
-                <ul class="toc-list" id="toc-list">
-                    <!-- filled by JS -->
-                </ul>
-            </nav>
-
-            <!-- Content -->
-            <main id="content">
-                <div class="content-inner" id="markdown-content">
-                    <!-- rendered markdown goes here -->
-                </div>
-            </main>
+      <!-- Toolbar -->
+      <header id="toolbar">
+        <div class="toolbar-left">
+          <span class="file-icon">📄</span>
+          <span class="file-name" id="file-name-display">document.md</span>
+          <span class="file-stats" id="file-stats-display">
+            <span id="stat-words">0</span> words
+            <span class="sep">·</span>
+            <span id="stat-headings">0</span> headings
+            <span class="sep">·</span>
+            <span id="stat-codeblocks">0</span> code blocks
+            <span class="sep">·</span>
+            <span id="stat-reading">0 min</span>
+          </span>
         </div>
+        <div class="toolbar-right">
+          <button
+            class="btn-icon"
+            id="theme-toggle"
+            aria-label="Switch theme"
+            title="Toggle theme (Ctrl+Shift+D)"
+          ></button>
+          <button
+            class="btn-icon"
+            id="fullscreen-btn"
+            aria-label="Enter fullscreen"
+            title="Enter fullscreen"
+          ></button>
+          <button
+            class="btn-icon"
+            id="download-btn"
+            aria-label="Download HTML"
+            title="Download HTML"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+          <button
+            class="btn-icon"
+            id="reupload-btn"
+            aria-label="Upload another file"
+            title="Upload another file"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+              />
+            </svg>
+          </button>
+          <input type="file" id="file-input-toolbar" accept=".md,.markdown" />
+        </div>
+      </header>
 
-        <!-- Back to Top -->
-        <button id="back-to-top" aria-label="Back to top">↑</button>
+      <!-- Progress Bar -->
+      <div id="progress-bar"></div>
 
-        <!-- TOC Toggle (mobile) -->
-        <button id="toc-toggle" aria-label="Toggle table of contents">☰</button>
+      <!-- Main -->
+      <div id="main">
+        <!-- TOC Overlay (mobile) -->
+        <div id="toc-overlay"></div>
+
+        <!-- TOC Sidebar -->
+        <nav id="toc" aria-label="Table of Contents">
+          <div class="toc-title">Contents</div>
+          <ul class="toc-list" id="toc-list">
+            <!-- filled by JS -->
+          </ul>
+        </nav>
+
+        <!-- Content -->
+        <main id="content">
+          <div class="content-inner" id="markdown-content">
+            <!-- rendered markdown goes here -->
+          </div>
+        </main>
+      </div>
+
+      <!-- Back to Top -->
+      <button id="back-to-top" aria-label="Back to top">
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="18 15 12 9 6 15" />
+        </svg>
+      </button>
+
+      <!-- TOC Toggle (mobile) -->
+      <button
+        id="toc-toggle"
+        aria-label="Toggle table of contents"
+        aria-expanded="false"
+      ></button>
     </div>
 
     <!-- ===== JAVASCRIPT ===== -->
     <script>
-        (function() {
-            'use strict';
+      (function () {
+        "use strict";
 
-            // ─── CONFIG ────────────────────────────────────────────────────────────
-            const CONFIG = {
-                tocSelector: '#toc-list',
-                contentSelector: '#markdown-content',
-                progressSelector: '#progress-bar',
-                backToTopSelector: '#back-to-top',
-                toastSelector: '#toast',
-                toastMessageSelector: '#toast-message',
-                maxFileSize: 10 * 1024 * 1024, // 10MB
+        // ─── CONFIG ────────────────────────────────────────────────────────────
+        const CONFIG = {
+          maxFileSize: 10 * 1024 * 1024, // 10MB
+          largeFileSize: 1024 * 1024, // show loading toast above this
+        };
+
+        const HLJS_LIGHT =
+          "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css";
+        const HLJS_DARK =
+          "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css";
+        const HLJS_SCRIPT =
+          "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js";
+
+        // ─── STATE ─────────────────────────────────────────────────────────────
+        const state = {
+          currentFile: null,
+          theme: "light",
+          tocItems: [],
+          tocObserver: null,
+          stats: {
+            words: 0,
+            headings: 0,
+            codeBlocks: 0,
+          },
+        };
+
+        let loadRequestId = 0;
+        let toastTimer = null;
+
+        // ─── DOM REFS ──────────────────────────────────────────────────────────
+        const DOM = {
+          emptyState: $("#empty-state"),
+          dropZone: $("#drop-zone"),
+          dropHint: $("#drop-hint"),
+          fileInput: $("#file-input"),
+          fileInputToolbar: $("#file-input-toolbar"),
+          chooseBtn: $("#choose-file-btn"),
+          exampleBtn: $("#example-btn"),
+
+          app: $("#app"),
+          fileName: $("#file-name-display"),
+          statWords: $("#stat-words"),
+          statHeadings: $("#stat-headings"),
+          statCodeblocks: $("#stat-codeblocks"),
+          statReading: $("#stat-reading"),
+
+          content: $("#content"),
+          markdownContent: $("#markdown-content"),
+          tocList: $("#toc-list"),
+          tocNav: $("#toc"),
+          tocToggle: $("#toc-toggle"),
+          tocOverlay: $("#toc-overlay"),
+          backToTop: $("#back-to-top"),
+          progressBar: $("#progress-bar"),
+
+          themeToggle: $("#theme-toggle"),
+          fullscreenBtn: $("#fullscreen-btn"),
+          downloadBtn: $("#download-btn"),
+          reuploadBtn: $("#reupload-btn"),
+
+          toast: $("#toast"),
+          toastMessage: $("#toast-message"),
+        };
+
+        function $(sel) {
+          return document.querySelector(sel);
+        }
+
+        // ─── ICONS (inline SVG, safe static markup) ────────────────────────────
+        function svg(inner, size) {
+          const s = size || 18;
+          return (
+            '<svg viewBox="0 0 24 24" width="' +
+            s +
+            '" height="' +
+            s +
+            '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" ' +
+            'stroke-linejoin="round" aria-hidden="true">' +
+            inner +
+            "</svg>"
+          );
+        }
+
+        const ICONS = {
+          sun: svg(
+            '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+          ),
+          moon: svg(
+            '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+          ),
+          fullscreenEnter: svg(
+            '<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>',
+          ),
+          fullscreenExit: svg(
+            '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+          ),
+          menu: svg(
+            '<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>',
+          ),
+          menuClose: svg(
+            '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+            20,
+          ),
+        };
+
+        // ─── THEME ─────────────────────────────────────────────────────────────
+        function getSystemTheme() {
+          return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+
+        function loadTheme() {
+          const saved = localStorage.getItem("md-formatter-theme");
+          state.theme =
+            saved === "dark" || saved === "light" ? saved : getSystemTheme();
+          applyTheme(state.theme);
+        }
+
+        function applyTheme(theme) {
+          state.theme = theme;
+          document.documentElement.setAttribute("data-theme", theme);
+          localStorage.setItem("md-formatter-theme", theme);
+
+          DOM.themeToggle.innerHTML = theme === "dark" ? ICONS.sun : ICONS.moon;
+          DOM.themeToggle.setAttribute(
+            "aria-label",
+            theme === "dark" ? "Switch to light theme" : "Switch to dark theme",
+          );
+          DOM.themeToggle.title =
+            theme === "dark"
+              ? "Switch to light theme (Ctrl+Shift+D)"
+              : "Switch to dark theme (Ctrl+Shift+D)";
+
+          const hljsLink = document.getElementById("hljs-theme");
+          if (hljsLink) {
+            hljsLink.href = theme === "dark" ? HLJS_DARK : HLJS_LIGHT;
+          }
+        }
+
+        function toggleTheme() {
+          applyTheme(state.theme === "light" ? "dark" : "light");
+        }
+
+        // ─── TOAST ─────────────────────────────────────────────────────────────
+        function showToast(message, type) {
+          const el = DOM.toast;
+          const icon = el.querySelector(".toast-icon");
+          DOM.toastMessage.textContent = message;
+          el.className = "toast " + (type || "info");
+          if (type === "error") icon.textContent = "❌";
+          else if (type === "success") icon.textContent = "✅";
+          else icon.textContent = "📌";
+          el.classList.add("show");
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => el.classList.remove("show"), 4000);
+        }
+
+        // ─── FILE HANDLING ────────────────────────────────────────────────────
+        function isMarkdownFile(file) {
+          const ext = file.name.split(".").pop().toLowerCase();
+          return ["md", "markdown"].includes(ext);
+        }
+
+        function validateFile(file) {
+          if (!file) return { valid: false, error: "No file selected." };
+          if (!isMarkdownFile(file)) {
+            return {
+              valid: false,
+              error: "Please upload a .md or .markdown file.",
             };
-
-            // ─── STATE ─────────────────────────────────────────────────────────────
-            const state = {
-                currentFile: null,
-                currentContent: '',
-                currentHtml: '',
-                theme: 'light',
-                tocItems: [],
-                isFullscreen: false,
-                stats: {
-                    words: 0,
-                    chars: 0,
-                    headings: 0,
-                    codeBlocks: 0,
-                    readingTime: 0,
-                },
+          }
+          if (file.size === 0) {
+            return { valid: false, error: "The file is empty." };
+          }
+          if (file.size > CONFIG.maxFileSize) {
+            return {
+              valid: false,
+              error:
+                "File exceeds " +
+                CONFIG.maxFileSize / 1024 / 1024 +
+                "MB limit.",
             };
+          }
+          return { valid: true };
+        }
 
-            // ─── DOM REFS ──────────────────────────────────────────────────────────
-            const $ = (sel) => document.querySelector(sel);
-            const $$ = (sel) => document.querySelectorAll(sel);
+        function readFileAsText(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error("Failed to read file."));
+            reader.readAsText(file, "UTF-8");
+          });
+        }
 
-            const DOM = {
-                emptyState: $('#empty-state'),
-                dropZone: $('#drop-zone'),
-                fileInput: $('#file-input'),
-                fileInputToolbar: $('#file-input-toolbar'),
-                chooseBtn: $('#choose-file-btn'),
-                exampleBtn: $('#example-btn'),
-                fileInfo: $('#file-info'),
+        // ─── SECURITY / TEXT HELPERS ──────────────────────────────────────────
+        function escapeHtml(value) {
+          return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
 
-                app: $('#app'),
-                toolbar: $('#toolbar'),
-                fileName: $('#file-name-display'),
-                fileStats: $('#file-stats-display'),
-                statWords: $('#stat-words'),
-                statHeadings: $('#stat-headings'),
-                statCodeblocks: $('#stat-codeblocks'),
-                statReading: $('#stat-reading'),
+        function sanitizeFilename(name) {
+          return (
+            String(name)
+              .replace(/[\\/:*?"<>|]/g, "-")
+              .replace(/\s+/g, " ")
+              .replace(/[.\s]+$/, "")
+              .trim() || "document"
+          );
+        }
 
-                content: $('#markdown-content'),
-                tocList: $('#toc-list'),
-                tocNav: $('#toc'),
-                tocToggle: $('#toc-toggle'),
-                tocOverlay: $('#toc-overlay'),
-                backToTop: $('#back-to-top'),
-                progressBar: $('#progress-bar'),
+        function dedent(str) {
+          return String(str)
+            .replace(/^ {4}/gm, "")
+            .trim();
+        }
 
-                themeToggle: $('#theme-toggle'),
-                fullscreenBtn: $('#fullscreen-btn'),
-                downloadBtn: $('#download-btn'),
-                reuploadBtn: $('#reupload-btn'),
+        // ─── MARKDOWN PROCESSING ──────────────────────────────────────────────
+        function parseMarkdown(text) {
+          try {
+            marked.setOptions({
+              gfm: true,
+              breaks: true,
+              pedantic: false,
+            });
+            const rawHtml = marked.parse(text);
+            // Pipeline: Markdown → Marked → HTML → DOMPurify → DOM → Highlight.js
+            return DOMPurify.sanitize(rawHtml, {
+              USE_PROFILES: { html: true },
+              ADD_ATTR: ["target"],
+              ADD_TAGS: ["input"],
+            });
+          } catch (err) {
+            console.error("Parse error:", err);
+            throw new Error("Failed to parse Markdown: " + err.message);
+          }
+        }
 
-                toast: $('#toast'),
-                toastMessage: $('#toast-message'),
-            };
+        // ─── STATISTICS ────────────────────────────────────────────────────────
+        function calculateStats() {
+          // Word count is derived from the rendered document text so Markdown
+          // syntax tokens are not counted. Code content contributes because it
+          // is part of the rendered text.
+          const text = DOM.markdownContent.textContent
+            .replace(/\s+/g, " ")
+            .trim();
+          const words = text ? text.split(" ").length : 0;
+          const headings = DOM.markdownContent.querySelectorAll(
+            "h1, h2, h3, h4, h5, h6",
+          ).length;
+          const codeBlocks =
+            DOM.markdownContent.querySelectorAll("pre code").length;
+          return { words, headings, codeBlocks };
+        }
 
-            // ─── THEME ─────────────────────────────────────────────────────────────
-            function getSystemTheme() {
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        function formatReadingTime(words) {
+          if (words === 0) return "0 min";
+          if (words < 200) return "<1 min";
+          return Math.ceil(words / 200) + " min";
+        }
+
+        function updateStats(stats) {
+          DOM.statWords.textContent = stats.words;
+          DOM.statHeadings.textContent = stats.headings;
+          DOM.statCodeblocks.textContent = stats.codeBlocks;
+          DOM.statReading.textContent = formatReadingTime(stats.words);
+          state.stats = stats;
+        }
+
+        // ─── SCROLL CONTAINER ─────────────────────────────────────────────────
+        function getScrollContainer() {
+          return DOM.content;
+        }
+
+        function updateProgress() {
+          const scroller = getScrollContainer();
+          const maxScroll = scroller.scrollHeight - scroller.clientHeight;
+          const progress =
+            maxScroll > 0
+              ? Math.min(
+                  100,
+                  Math.max(0, (scroller.scrollTop / maxScroll) * 100),
+                )
+              : 0;
+          DOM.progressBar.style.width = progress + "%";
+        }
+
+        // ─── RENDER ────────────────────────────────────────────────────────────
+        function renderDocument(html) {
+          DOM.markdownContent.replaceChildren();
+          DOM.markdownContent.innerHTML = html;
+
+          // External links open in a new tab with rel protection
+          DOM.markdownContent
+            .querySelectorAll('a[href^="http"]')
+            .forEach((a) => {
+              a.target = "_blank";
+              a.rel = "noopener noreferrer";
+            });
+
+          // Graceful broken-image handling
+          DOM.markdownContent.querySelectorAll("img").forEach((img) => {
+            const mark = () => img.classList.add("broken");
+            img.addEventListener("error", mark);
+            if (img.complete && img.naturalWidth === 0) mark();
+          });
+
+          // Highlight + wrap code blocks
+          DOM.markdownContent.querySelectorAll("pre code").forEach((block) => {
+            try {
+              hljs.highlightElement(block);
+            } catch (e) {
+              block.classList.add("hljs");
+            }
+            wrapCodeBlock(block);
+          });
+
+          // Wrap tables so they scroll horizontally without overflowing the page
+          DOM.markdownContent.querySelectorAll("table").forEach((table) => {
+            if (!table.parentElement.classList.contains("table-wrapper")) {
+              const wrapper = document.createElement("div");
+              wrapper.className = "table-wrapper";
+              table.parentElement.replaceChild(wrapper, table);
+              wrapper.appendChild(table);
+            }
+          });
+
+          // Task-list styling
+          DOM.markdownContent
+            .querySelectorAll('input[type="checkbox"]')
+            .forEach((cb) => {
+              const li = cb.closest("li");
+              if (li) li.classList.add("task-list-item");
+            });
+
+          generateTOC();
+          setupCopyButtons();
+        }
+
+        // ─── CODE BLOCKS ───────────────────────────────────────────────────────
+        const LANGUAGE_LABELS = {
+          javascript: "JavaScript",
+          js: "JavaScript",
+          typescript: "TypeScript",
+          ts: "TypeScript",
+          html: "HTML",
+          css: "CSS",
+          bash: "Bash",
+          shell: "Shell",
+          sh: "Shell",
+          python: "Python",
+          py: "Python",
+          json: "JSON",
+          markdown: "Markdown",
+          md: "Markdown",
+        };
+
+        function formatLanguage(lang) {
+          return LANGUAGE_LABELS[lang.toLowerCase()] || lang;
+        }
+
+        function wrapCodeBlock(block) {
+          const pre = block.parentElement;
+          if (!pre) return;
+
+          let lang = "";
+          Array.prototype.forEach.call(block.classList, (cls) => {
+            if (cls.indexOf("language-") === 0) {
+              lang = cls.slice("language-".length);
+            }
+          });
+
+          if (!pre.id) {
+            pre.id =
+              "code-" +
+              Date.now().toString(36) +
+              "-" +
+              Math.random().toString(36).slice(2, 6);
+          }
+
+          const header = document.createElement("div");
+          header.className = "code-header";
+
+          const langEl = document.createElement("span");
+          langEl.className = "lang";
+          langEl.textContent = lang ? formatLanguage(lang) : "Plain text";
+
+          const copyBtn = document.createElement("button");
+          copyBtn.className = "copy-btn";
+          copyBtn.textContent = "Copy";
+          copyBtn.setAttribute("aria-label", "Copy code");
+          copyBtn.dataset.copyTarget = pre.id;
+
+          header.append(langEl, copyBtn);
+          pre.parentElement.insertBefore(header, pre);
+        }
+
+        // ─── COPY BUTTONS ──────────────────────────────────────────────────────
+        function setupCopyButtons() {
+          DOM.markdownContent.querySelectorAll(".copy-btn").forEach((btn) => {
+            btn.addEventListener("click", handleCopyClick);
+          });
+        }
+
+        function fallbackCopy(text) {
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.setAttribute("readonly", "");
+            ta.style.position = "fixed";
+            ta.style.top = "0";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            const ok = document.execCommand("copy");
+            document.body.removeChild(ta);
+            return ok;
+          } catch (e) {
+            return false;
+          }
+        }
+
+        async function copyText(text) {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (e) {
+            return fallbackCopy(text);
+          }
+        }
+
+        async function handleCopyClick(e) {
+          const btn = e.currentTarget;
+          const pre = document.getElementById(btn.dataset.copyTarget);
+          const code = pre && pre.querySelector("code");
+          const text = code ? code.textContent : pre ? pre.textContent : "";
+          const trimmed = text.trim();
+
+          if (!trimmed) {
+            showToast("Nothing to copy.", "error");
+            return;
+          }
+
+          const ok = await copyText(trimmed);
+          if (ok) {
+            const original = btn.textContent;
+            btn.textContent = "Copied ✓";
+            btn.classList.add("copied");
+            setTimeout(() => {
+              btn.textContent = original;
+              btn.classList.remove("copied");
+            }, 2000);
+          } else {
+            showToast("Copy failed", "error");
+          }
+        }
+
+        // ─── TABLE OF CONTENTS ─────────────────────────────────────────────────
+        function createUniqueSlug(text, usedIds) {
+          const base =
+            text
+              .toLowerCase()
+              .trim()
+              .replace(/[^\w\s-]/g, "")
+              .replace(/\s+/g, "-")
+              .replace(/-+/g, "-")
+              .replace(/^-|-$/g, "") || "section";
+
+          let slug = base;
+          let counter = 2;
+          while (usedIds.has(slug)) {
+            slug = base + "-" + counter++;
+          }
+          usedIds.add(slug);
+          return slug;
+        }
+
+        function generateTOC() {
+          const headings = DOM.markdownContent.querySelectorAll(
+            "h1, h2, h3, h4, h5, h6",
+          );
+          const tocList = DOM.tocList;
+          tocList.replaceChildren();
+
+          state.tocItems = [];
+
+          if (headings.length === 0) {
+            const empty = document.createElement("li");
+            empty.className = "toc-empty";
+            empty.textContent = "No headings found";
+            tocList.appendChild(empty);
+            disposeTocObserver();
+            return;
+          }
+
+          const usedIds = new Set();
+          const items = [];
+
+          headings.forEach((h) => {
+            const level = parseInt(h.tagName.charAt(1), 10);
+            if (h.id) {
+              h.id = (() => {
+                const id = h.id;
+                if (usedIds.has(id))
+                  return createUniqueSlug(h.textContent, usedIds);
+                usedIds.add(id);
+                return id;
+              })();
+            } else {
+              h.id = createUniqueSlug(h.textContent, usedIds);
+            }
+            items.push({
+              id: h.id,
+              text: h.textContent.trim(),
+              level,
+              element: h,
+            });
+          });
+
+          state.tocItems = items;
+
+          const root = tocList;
+          const stack = [{ li: null, level: 0 }];
+
+          items.forEach((item) => {
+            while (
+              stack.length > 1 &&
+              stack[stack.length - 1].level >= item.level
+            ) {
+              stack.pop();
             }
 
-            function loadTheme() {
-                const saved = localStorage.getItem('md-formatter-theme');
-                if (saved === 'dark' || saved === 'light') {
-                    state.theme = saved;
-                } else {
-                    state.theme = getSystemTheme();
-                }
-                applyTheme(state.theme);
+            const parent = stack[stack.length - 1];
+            let container;
+            if (parent.li === null) {
+              container = root;
+            } else {
+              let childUl = parent.li.querySelector(":scope > ul");
+              if (!childUl) {
+                childUl = document.createElement("ul");
+                parent.li.appendChild(childUl);
+              }
+              container = childUl;
             }
 
-            function applyTheme(theme) {
-                state.theme = theme;
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('md-formatter-theme', theme);
-                DOM.themeToggle.textContent = theme === 'dark' ? '☀' : '🌙';
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = "#" + item.id;
+            a.textContent = item.text;
+            a.className = "level-" + item.level;
+            a.dataset.target = item.id;
+            a.addEventListener("click", (e) => {
+              e.preventDefault();
+              const target = document.getElementById(item.id);
+              if (target) {
+                closeTOCMobile();
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+                updateActiveTOC(item.id);
+              }
+            });
 
-                // Switch highlight.js theme
-                const hljsLink = document.getElementById('hljs-theme');
-                if (hljsLink) {
-                    hljsLink.href = theme === 'dark' ?
-                        'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css' :
-                        'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
-                }
+            li.appendChild(a);
+            container.appendChild(li);
+            stack.push({ li, level: item.level });
+          });
+
+          setupTOCScrollSpy();
+        }
+
+        function disposeTocObserver() {
+          if (state.tocObserver) {
+            state.tocObserver.disconnect();
+            state.tocObserver = null;
+          }
+        }
+
+        function setupTOCScrollSpy() {
+          disposeTocObserver();
+          const items = state.tocItems;
+          if (items.length === 0) return;
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              const visible = entries.filter((e) => e.isIntersecting);
+              if (visible.length === 0) return;
+              const top = visible.reduce((a, b) =>
+                a.boundingClientRect.top <= b.boundingClientRect.top ? a : b,
+              );
+              updateActiveTOC(top.target.id);
+            },
+            {
+              root: getScrollContainer(),
+              rootMargin: "-20px 0px -70% 0px",
+              threshold: 0,
+            },
+          );
+
+          items.forEach((item) => observer.observe(item.element));
+          state.tocObserver = observer;
+        }
+
+        function updateActiveTOC(id) {
+          DOM.tocList.querySelectorAll("a").forEach((a) => {
+            a.classList.toggle("active", a.dataset.target === id);
+          });
+        }
+
+        // ─── TOC MOBILE ────────────────────────────────────────────────────────
+        function openTOCMobile() {
+          DOM.tocNav.classList.add("open");
+          DOM.tocOverlay.classList.add("visible");
+          DOM.tocToggle.classList.add("active");
+          DOM.tocToggle.setAttribute("aria-expanded", "true");
+          DOM.tocToggle.setAttribute("aria-label", "Close table of contents");
+          DOM.tocToggle.innerHTML = ICONS.menuClose;
+          DOM.app.classList.add("toc-open");
+        }
+
+        function closeTOCMobile() {
+          DOM.tocNav.classList.remove("open");
+          DOM.tocOverlay.classList.remove("visible");
+          DOM.tocToggle.classList.remove("active");
+          DOM.tocToggle.setAttribute("aria-expanded", "false");
+          DOM.tocToggle.setAttribute("aria-label", "Toggle table of contents");
+          DOM.tocToggle.innerHTML = ICONS.menu;
+          DOM.app.classList.remove("toc-open");
+        }
+
+        function toggleTOCMobile() {
+          if (DOM.tocNav.classList.contains("open")) {
+            closeTOCMobile();
+          } else {
+            openTOCMobile();
+          }
+        }
+
+        // ─── BACK TO TOP + PROGRESS ───────────────────────────────────────────
+        function setupBackToTop() {
+          const scroller = getScrollContainer();
+          const threshold = 300;
+
+          scroller.addEventListener(
+            "scroll",
+            () => {
+              DOM.backToTop.classList.toggle(
+                "visible",
+                scroller.scrollTop > threshold,
+              );
+              updateProgress();
+            },
+            { passive: true },
+          );
+
+          DOM.backToTop.addEventListener("click", () => {
+            scroller.scrollTo({ top: 0, behavior: "smooth" });
+            DOM.backToTop.focus();
+          });
+        }
+
+        // ─── FULLSCREEN ────────────────────────────────────────────────────────
+        function updateFullscreenButton() {
+          const active = Boolean(document.fullscreenElement);
+          DOM.fullscreenBtn.innerHTML = active
+            ? ICONS.fullscreenExit
+            : ICONS.fullscreenEnter;
+          DOM.fullscreenBtn.setAttribute(
+            "aria-label",
+            active ? "Exit fullscreen" : "Enter fullscreen",
+          );
+          DOM.fullscreenBtn.title = active
+            ? "Exit fullscreen"
+            : "Enter fullscreen";
+        }
+
+        function toggleFullscreen() {
+          if (!document.fullscreenElement) {
+            document.documentElement
+              .requestFullscreen()
+              .catch(() =>
+                showToast(
+                  "Fullscreen is not available in this browser.",
+                  "error",
+                ),
+              );
+          } else {
+            document
+              .exitFullscreen()
+              .catch(() => showToast("Could not exit fullscreen.", "error"));
+          }
+        }
+
+        // ─── DOWNLOAD HTML ────────────────────────────────────────────────────
+        function getExportStyles() {
+          return `<style>
+:root {
+    --max-width: 820px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", "Cascadia Code", "Consolas", "Liberation Mono", monospace;
+    --bg-page: #f6f8fa; --bg-content: #ffffff; --bg-code: #f6f8fa; --bg-code-block: #f6f8fa;
+    --bg-code-header: #f0f2f5; --bg-table-stripe: #f8f9fb; --bg-blockquote: #f0f4ff;
+    --text-primary: #1f2937; --text-secondary: #4b5563; --text-muted: #9ca3af;
+    --text-heading: #0f172a; --text-link: #2563eb; --text-link-hover: #1d4ed8;
+    --text-code: #d63384; --text-code-block: #1f2937;
+    --border-color: #e5e7eb; --border-focus: #2563eb;
+    --radius: 8px; --transition: 0.2s ease;
+}
+[data-theme="dark"] {
+    --bg-page: #0d1117; --bg-content: #161b22; --bg-code: #1c2333; --bg-code-block: #1c2333;
+    --bg-code-header: #1c2333; --bg-table-stripe: #1c2333; --bg-blockquote: #1c2333;
+    --text-primary: #e6edf3; --text-secondary: #8b949e; --text-muted: #484f58;
+    --text-heading: #f0f6fc; --text-link: #58a6ff; --text-link-hover: #79c0ff;
+    --text-code: #f0888e; --text-code-block: #e6edf3;
+    --border-color: #30363d; --border-focus: #58a6ff;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+}
+.content { max-width: 100%; padding: 48px 32px 96px; }
+.content-inner { max-width: var(--max-width); margin: 0 auto; }
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-heading);
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 1.8em 0 0.5em;
+    scroll-margin-top: 24px;
+}
+h1 { font-size: 2.2em; margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3em; }
+h2 { font-size: 1.7em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25em; }
+h3 { font-size: 1.35em; }
+h4 { font-size: 1.15em; }
+h5 { font-size: 1em; }
+h6 { font-size: 0.9em; color: var(--text-secondary); }
+p { margin: 0 0 1.2em; }
+a { color: var(--text-link); text-decoration: none; border-bottom: 1px solid transparent; }
+a:hover { color: var(--text-link-hover); border-bottom-color: var(--text-link-hover); }
+strong { font-weight: 700; color: var(--text-heading); }
+em { font-style: italic; }
+del { text-decoration: line-through; color: var(--text-secondary); }
+blockquote {
+    margin: 1.2em 0;
+    padding: 12px 20px;
+    background: var(--bg-blockquote);
+    border-left: 4px solid var(--text-link);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--text-secondary);
+}
+blockquote p:last-child { margin-bottom: 0; }
+ul, ol { margin: 0 0 1.2em; padding-left: 1.8em; }
+ul ul, ol ol, ul ol, ol ul { margin-bottom: 0.4em; }
+li { margin-bottom: 0.2em; }
+li > p { margin-bottom: 0.2em; }
+.task-list-item { list-style: none; display: flex; align-items: flex-start; gap: 8px; padding-left: 0; }
+.task-list-item input[type="checkbox"] { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--border-focus); flex-shrink: 0; }
+ul .task-list-item { margin-left: -1.8em; }
+hr { border: none; height: 1px; background: var(--border-color); margin: 2.4em 0; }
+img { max-width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--border-color); margin: 0.8em 0; }
+img.broken { border-style: dashed; opacity: 0.7; min-height: 48px; padding: 16px; }
+pre {
+    margin: 1.2em 0;
+    border-radius: var(--radius);
+    background: var(--bg-code-block);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    position: relative;
+}
+pre code {
+    display: block;
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    line-height: 1.65;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--text-code-block);
+    tab-size: 2;
+}
+code:not(pre code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 0.2em 0.5em;
+    background: var(--bg-code);
+    border-radius: 4px;
+    color: var(--text-code);
+    border: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+pre blockquote code:not(pre code) { background: var(--bg-code); }
+.code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--bg-code-header);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+}
+.code-header .lang { text-transform: uppercase; letter-spacing: 0.3px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.code-header .copy-btn { display: none; }
+.table-wrapper { overflow-x: auto; margin: 1.2em 0; border-radius: var(--radius); border: 1px solid var(--border-color); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+table th { background: var(--bg-table-stripe); font-weight: 700; color: var(--text-heading); padding: 10px 14px; text-align: left; border-bottom: 2px solid var(--border-color); }
+table td { padding: 9px 14px; border-bottom: 1px solid var(--border-color); }
+table tr:last-child td { border-bottom: none; }
+table tbody tr:nth-child(even) { background: var(--bg-table-stripe); }
+@media print {
+    body { background: #fff !important; color: #000 !important; }
+    .content { padding: 20px 40px; }
+    h1, h2, h3, h4, h5, h6 { color: #000 !important; }
+    a { color: #000 !important; border-bottom-color: #000 !important; }
+    pre { background: #f5f5f5 !important; border-color: #ddd !important; break-inside: avoid; }
+    code:not(pre code) { background: #f5f5f5 !important; border-color: #ddd !important; color: #d63384 !important; }
+    table { border-collapse: collapse; }
+    table th { background: #f0f0f0 !important; }
+    table td { border-bottom-color: #ddd !important; }
+    blockquote { background: #f8f8f8 !important; border-left-color: #333 !important; break-inside: avoid; }
+    img { border-color: #ddd !important; break-inside: avoid; }
+    tr, pre, blockquote, .table-wrapper { break-inside: avoid; }
+    .code-header { background: #f0f0f0 !important; border-bottom-color: #ddd !important; }
+    .code-header .lang { color: #555 !important; }
+}
+</style>`;
+        }
+
+        function downloadHTML() {
+          const contentHtml = DOM.markdownContent.innerHTML;
+          const rawTitle = state.currentFile
+            ? state.currentFile.name.replace(/\.[^.]+$/, "")
+            : "document";
+          const title = sanitizeFilename(rawTitle);
+          const safeTitle = escapeHtml(title);
+          const theme = state.theme;
+
+          const standalone = `<!DOCTYPE html>
+<html lang="en" data-theme="${theme}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${safeTitle} · Markdown Formatter</title>
+    <link rel="stylesheet" href="${theme === "dark" ? HLJS_DARK : HLJS_LIGHT}">
+    ${getExportStyles()}
+</head>
+<body>
+    <main class="content">
+        <div class="content-inner">
+${contentHtml}
+        </div>
+    </main>
+    <script src="${HLJS_SCRIPT}"><\/script>
+    <script>
+        window.addEventListener('load', function () {
+            document.querySelectorAll('pre code').forEach(function (block) {
+                try { hljs.highlightElement(block); } catch (e) { block.classList.add('hljs'); }
+            });
+        });
+    <\/script>
+</body>
+</html>`;
+
+          const blob = new Blob([standalone], {
+            type: "text/html;charset=utf-8",
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = title + ".html";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast(
+            "HTML downloaded (internet needed for highlighting)",
+            "success",
+          );
+        }
+
+        // ─── LOAD FILE ─────────────────────────────────────────────────────────
+        function setLoading(loading) {
+          const controls = [
+            DOM.downloadBtn,
+            DOM.reuploadBtn,
+            DOM.themeToggle,
+            DOM.fullscreenBtn,
+          ];
+          controls.forEach((btn) => {
+            btn.disabled = loading;
+          });
+          DOM.app.classList.toggle("loading", loading);
+        }
+
+        function resetDocState() {
+          DOM.progressBar.style.width = "0%";
+          DOM.backToTop.classList.remove("visible");
+          closeTOCMobile();
+          state.tocItems = [];
+          disposeTocObserver();
+        }
+
+        async function loadFile(file) {
+          const requestId = ++loadRequestId;
+
+          const validation = validateFile(file);
+          if (!validation.valid) {
+            showToast(validation.error, "error");
+            return;
+          }
+
+          if (file.size > CONFIG.largeFileSize) {
+            showToast("Parsing Markdown…", "info");
+          }
+          setLoading(true);
+
+          try {
+            const content = await readFileAsText(file);
+
+            if (requestId !== loadRequestId) return;
+
+            if (!content.trim()) {
+              setLoading(false);
+              showToast(
+                "The file is empty or contains only whitespace.",
+                "error",
+              );
+              return;
             }
 
-            function toggleTheme() {
-                applyTheme(state.theme === 'light' ? 'dark' : 'light');
+            resetDocState();
+
+            state.currentFile = file;
+            const html = parseMarkdown(content);
+
+            DOM.fileName.textContent = file.name;
+            DOM.emptyState.classList.add("hidden");
+            DOM.app.classList.add("visible");
+
+            renderDocument(html);
+            updateStats(calculateStats());
+
+            getScrollContainer().scrollTop = 0;
+
+            showToast('Loaded "' + file.name + '"', "success");
+          } catch (err) {
+            console.error(err);
+            if (requestId === loadRequestId) {
+              showToast("Error loading file: " + err.message, "error");
             }
-
-            // ─── TOAST ─────────────────────────────────────────────────────────────
-            let toastTimer = null;
-
-            function showToast(message, type = 'info') {
-                const el = DOM.toast;
-                const msg = DOM.toastMessage;
-                const icon = el.querySelector('.toast-icon');
-                msg.textContent = message;
-                el.className = 'toast ' + type;
-                if (type === 'error') icon.textContent = '❌';
-                else if (type === 'success') icon.textContent = '✅';
-                else icon.textContent = '📌';
-                el.classList.add('show');
-                clearTimeout(toastTimer);
-                toastTimer = setTimeout(() => {
-                    el.classList.remove('show');
-                }, 4000);
-            }
-
-            // ─── FILE HANDLING ────────────────────────────────────────────────────
-            function validateFile(file) {
-                if (!file) return { valid: false, error: 'No file selected.' };
-                const ext = file.name.split('.').pop().toLowerCase();
-                if (!['md', 'markdown'].includes(ext)) {
-                    return { valid: false, error: 'Please upload a .md or .markdown file.' };
-                }
-                if (file.size === 0) {
-                    return { valid: false, error: 'The file is empty.' };
-                }
-                if (file.size > CONFIG.maxFileSize) {
-                    return { valid: false, error: `File exceeds ${CONFIG.maxFileSize / 1024 / 1024}MB limit.` };
-                }
-                return { valid: true };
-            }
-
-            function formatFileSize(bytes) {
-                if (bytes < 1024) return bytes + ' B';
-                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-                return (bytes / 1024 / 1024).toFixed(1) + ' MB';
-            }
-
-            function readFileAsText(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.onerror = () => reject(new Error('Failed to read file.'));
-                    reader.readAsText(file, 'UTF-8');
-                });
-            }
-
-            // ─── MARKDOWN PROCESSING ──────────────────────────────────────────────
-            function parseMarkdown(text) {
-                try {
-                    // Configure marked
-                    marked.setOptions({
-                        gfm: true,
-                        breaks: true,
-                        pedantic: false,
-                        smartLists: true,
-                        smartypants: true,
-                        xhtml: false,
-                        headerIds: true,
-                        mangle: false,
-                    });
-                    const rawHtml = marked.parse(text);
-                    // Sanitize with DOMPurify
-                    const cleanHtml = DOMPurify.sanitize(rawHtml, {
-                        USE_PROFILES: { html: true },
-                        ADD_ATTR: ['target'],
-                        ADD_TAGS: ['input'],
-                    });
-                    return cleanHtml;
-                } catch (err) {
-                    console.error('Parse error:', err);
-                    throw new Error('Failed to parse Markdown: ' + err.message);
-                }
-            }
-
-            // ─── STATISTICS ────────────────────────────────────────────────────────
-            function calculateStats(markdown, html) {
-                // Word count: split on whitespace, filter empty
-                const words = markdown.trim() ? markdown.trim().split(/\s+/).length : 0;
-                const chars = markdown.length;
-
-                // Headings: count # at start of line (markdown)
-                const headingMatches = markdown.match(/^#{1,6}\s+.+$/gm);
-                const headings = headingMatches ? headingMatches.length : 0;
-
-                // Code blocks: count ```fenced blocks
-                const codeMatches = markdown.match(/```[\s\S]*?```/g);
-                const codeBlocks = codeMatches ? codeMatches.length : 0;
-
-                // Reading time: ~200 words per minute
-                const readingTime = Math.max(1, Math.round(words / 200));
-
-                return { words, chars, headings, codeBlocks, readingTime };
-            }
-
-            function updateStats(stats) {
-                DOM.statWords.textContent = stats.words;
-                DOM.statHeadings.textContent = stats.headings;
-                DOM.statCodeblocks.textContent = stats.codeBlocks;
-                DOM.statReading.textContent = '~' + stats.readingTime + ' min';
-                state.stats = stats;
-            }
-
-            // ─── RENDER ────────────────────────────────────────────────────────────
-            function renderDocument(html, markdown) {
-                DOM.content.innerHTML = html;
-
-                // Highlight code blocks
-                DOM.content.querySelectorAll('pre code').forEach((block) => {
-                    // Check if it already has hljs class
-                    if (!block.classList.contains('hljs')) {
-                        try {
-                            hljs.highlightElement(block);
-                        } catch (e) {
-                            // fallback: just add class
-                            block.classList.add('hljs');
-                        }
-                    }
-                    // Wrap in a container with header
-                    const pre = block.parentElement;
-                    if (pre && !pre.dataset.wrapped) {
-                        wrapCodeBlock(pre, block);
-                        pre.dataset.wrapped = 'true';
-                    }
-                });
-
-                // Process tables: wrap in scroll container
-                DOM.content.querySelectorAll('table').forEach((table) => {
-                    if (!table.parentElement.classList.contains('table-wrapper')) {
-                        const wrapper = document.createElement('div');
-                        wrapper.className = 'table-wrapper';
-                        table.parentElement.replaceChild(wrapper, table);
-                        wrapper.appendChild(table);
-                    }
-                });
-
-                // Process checkboxes: ensure task-list styling
-                DOM.content.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
-                    const li = cb.closest('li');
-                    if (li) {
-                        li.classList.add('task-list-item');
-                    }
-                });
-
-                // Generate TOC from headings
-                generateTOC();
-
-                // Re-apply copy buttons (they might have been reset)
-                setupCopyButtons();
-            }
-
-            // ─── CODE BLOCK WRAPPING ──────────────────────────────────────────────
-            function wrapCodeBlock(pre, code) {
-                // Determine language
-                let lang = 'text';
-                const classList = code.className.split(' ');
-                for (const cls of classList) {
-                    if (cls.startsWith('language-')) {
-                        lang = cls.replace('language-', '');
-                        break;
-                    }
-                }
-                // Also check data-lang from pre
-                if (pre.dataset.lang) lang = pre.dataset.lang;
-
-                // Build header
-                const header = document.createElement('div');
-                header.className = 'code-header';
-                header.innerHTML = `
-                    <span class="lang">${lang}</span>
-                    <button class="copy-btn" data-copy-target="${pre.id || ''}">Copy</button>
-                `;
-
-                // Give pre an id if not present
-                if (!pre.id) {
-                    pre.id = 'code-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-                }
-                const copyBtn = header.querySelector('.copy-btn');
-                copyBtn.dataset.copyTarget = pre.id;
-
-                // Insert header before pre
-                pre.parentElement.insertBefore(header, pre);
-
-                // Also add line numbers if practical (simple approach)
-                // We'll add line numbers via CSS with a data attribute
-                // Actually, let's use a simpler approach: we'll just render line numbers
-                // using a separate mechanism - we'll use a lightweight approach
-                // For simplicity, we'll use the hljs-ln class approach
-                // Let's check if we can add line numbers via the highlight.js line numbers plugin
-                // But since we're not using the plugin, we'll do a simple version
-
-                // We'll add line numbers by wrapping the code content
-                // This is a simplified version - we'll just use CSS counters
-                // Or we can use the approach of splitting lines
-                // For now, let's add a data attribute for line numbers
-                const lines = code.textContent.split('\n').length;
-                if (lines > 1 && lines < 200) {
-                    // Add line numbers using a simple approach
-                    const lineNumbers = document.createElement('div');
-                    lineNumbers.className = 'hljs-ln-numbers';
-                    lineNumbers.style.cssText = `
-                        display: none;
-                        float: left;
-                        padding-right: 16px;
-                        text-align: right;
-                        color: var(--text-muted);
-                        font-size: 12px;
-                        user-select: none;
-                        width: 28px;
-                        border-right: 1px solid var(--border-color);
-                        opacity: 0.6;
-                        font-variant-numeric: tabular-nums;
-                        line-height: 1.65;
-                    `;
-                    let numHtml = '';
-                    for (let i = 1; i <= lines; i++) {
-                        numHtml += i + '\n';
-                    }
-                    // We'll use a different approach - add line numbers via CSS
-                    // Actually, this gets complicated. Let's use a simpler approach
-                    // with a data attribute and pseudo-elements
-                    pre.style.position = 'relative';
-                    pre.style.paddingLeft = '48px';
-                    // We'll use a ::before with content
-                    // This is tricky with code blocks, so let's just use a wrapper
-                    // Actually, for simplicity, let's skip line numbers for now
-                    // The user requested line numbers "if practical" - let's keep it simple
-                }
-            }
-
-            // ─── COPY BUTTONS ──────────────────────────────────────────────────────
-            function setupCopyButtons() {
-                DOM.content.querySelectorAll('.copy-btn').forEach((btn) => {
-                    btn.removeEventListener('click', handleCopyClick);
-                    btn.addEventListener('click', handleCopyClick);
-                });
-                // Also any other copy buttons in the document
-                document.querySelectorAll('.copy-btn:not([data-copy-target])').forEach((btn) => {
-                    btn.removeEventListener('click', handleCopyClick);
-                    btn.addEventListener('click', handleCopyClick);
-                });
-            }
-
-            function handleCopyClick(e) {
-                const btn = e.currentTarget;
-                const targetId = btn.dataset.copyTarget;
-                let textToCopy = '';
-
-                if (targetId) {
-                    const pre = document.getElementById(targetId);
-                    if (pre) {
-                        const code = pre.querySelector('code');
-                        if (code) {
-                            textToCopy = code.textContent;
-                        } else {
-                            textToCopy = pre.textContent;
-                        }
-                    }
-                } else {
-                    // Fallback: find the nearest pre/code
-                    const pre = btn.closest('pre');
-                    if (pre) {
-                        const code = pre.querySelector('code');
-                        textToCopy = code ? code.textContent : pre.textContent;
-                    }
-                }
-
-                if (!textToCopy) {
-                    showToast('Nothing to copy.', 'error');
-                    return;
-                }
-
-                navigator.clipboard.writeText(textToCopy.trim()).then(() => {
-                    const original = btn.textContent;
-                    btn.textContent = 'Copied ✓';
-                    btn.classList.add('copied');
-                    setTimeout(() => {
-                        btn.textContent = original;
-                        btn.classList.remove('copied');
-                    }, 2000);
-                }).catch(() => {
-                    // Fallback: use textarea
-                    try {
-                        const ta = document.createElement('textarea');
-                        ta.value = textToCopy.trim();
-                        document.body.appendChild(ta);
-                        ta.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(ta);
-                        const original = btn.textContent;
-                        btn.textContent = 'Copied ✓';
-                        btn.classList.add('copied');
-                        setTimeout(() => {
-                            btn.textContent = original;
-                            btn.classList.remove('copied');
-                        }, 2000);
-                    } catch (err) {
-                        showToast('Failed to copy.', 'error');
-                    }
-                });
-            }
-
-            // ─── TABLE OF CONTENTS ────────────────────────────────────────────────
-            function generateTOC() {
-                const headings = DOM.content.querySelectorAll('h1, h2, h3, h4, h5, h6');
-                const tocList = DOM.tocList;
-                tocList.innerHTML = '';
-
-                if (headings.length === 0) {
-                    tocList.innerHTML = '<li style="color:var(--text-muted);font-size:13px;padding:8px;">No headings found</li>';
-                    state.tocItems = [];
-                    return;
-                }
-
-                let items = [];
-                headings.forEach((h) => {
-                    const level = parseInt(h.tagName.charAt(1), 10);
-                    let id = h.id;
-                    if (!id) {
-                        // Generate an ID from text
-                        id = h.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                        h.id = id;
-                    }
-                    items.push({
-                        id: id,
-                        text: h.textContent.trim(),
-                        level: level,
-                        element: h,
-                    });
-                });
-
-                state.tocItems = items;
-
-                // Build nested list
-                const root = document.createElement('ul');
-                root.className = 'toc-list';
-                let stack = [{ level: 0, ul: root }];
-
-                items.forEach((item) => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.href = '#' + item.id;
-                    a.textContent = item.text;
-                    a.className = 'level-' + item.level;
-                    a.dataset.target = item.id;
-                    a.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const target = document.getElementById(item.id);
-                        if (target) {
-                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            // Close TOC on mobile
-                            closeTOCMobile();
-                            // Update active
-                            updateActiveTOC(item.id);
-                        }
-                    });
-                    li.appendChild(a);
-
-                    // Find the right parent
-                    while (stack.length > 0 && stack[stack.length - 1].level >= item.level) {
-                        stack.pop();
-                    }
-                    if (stack.length === 0) {
-                        root.appendChild(li);
-                    } else {
-                        const parent = stack[stack.length - 1];
-                        // Ensure the parent has a UL
-                        let childUl = parent.ul.querySelector('ul');
-                        if (!childUl) {
-                            childUl = document.createElement('ul');
-                            parent.ul.appendChild(childUl);
-                        }
-                        childUl.appendChild(li);
-                    }
-                    stack.push({ level: item.level, ul: li });
-                });
-
-                tocList.appendChild(root);
-
-                // Setup scroll spy
-                setupTOCScrollSpy();
-            }
-
-            function setupTOCScrollSpy() {
-                // Simple scroll spy using IntersectionObserver
-                const items = state.tocItems;
-                if (items.length === 0) return;
-
-                // Disconnect old observer if any
-                if (window._tocObserver) {
-                    window._tocObserver.disconnect();
-                }
-
-                const headings = items.map((item) => item.element);
-                const observer = new IntersectionObserver((entries) => {
-                    let visible = entries.filter((e) => e.isIntersecting);
-                    if (visible.length > 0) {
-                        // Find the topmost visible heading
-                        let top = visible.reduce((a, b) => {
-                            return a.boundingClientRect.top < b.boundingClientRect.top ? a : b;
-                        });
-                        const id = top.target.id;
-                        updateActiveTOC(id);
-                    }
-                }, {
-                    rootMargin: '0px 0px -40% 0px',
-                    threshold: 0,
-                });
-
-                headings.forEach((h) => observer.observe(h));
-                window._tocObserver = observer;
-            }
-
-            function updateActiveTOC(id) {
-                DOM.tocList.querySelectorAll('a').forEach((a) => {
-                    a.classList.toggle('active', a.dataset.target === id);
-                });
-            }
-
-            // ─── TOC MOBILE ────────────────────────────────────────────────────────
-            function openTOCMobile() {
-                DOM.tocNav.classList.add('open');
-                DOM.tocOverlay.classList.add('visible');
-                DOM.tocToggle.classList.add('active');
-                DOM.tocToggle.textContent = '✕';
-            }
-
-            function closeTOCMobile() {
-                DOM.tocNav.classList.remove('open');
-                DOM.tocOverlay.classList.remove('visible');
-                DOM.tocToggle.classList.remove('active');
-                DOM.tocToggle.textContent = '☰';
-            }
-
-            function toggleTOCMobile() {
-                if (DOM.tocNav.classList.contains('open')) {
-                    closeTOCMobile();
-                } else {
-                    openTOCMobile();
-                }
-            }
-
-            // ─── BACK TO TOP ──────────────────────────────────────────────────────
-            function setupBackToTop() {
-                let lastScroll = 0;
-                const threshold = 300;
-                const btn = DOM.backToTop;
-
-                window.addEventListener('scroll', () => {
-                    const scrollY = window.scrollY || window.pageYOffset;
-                    if (scrollY > threshold) {
-                        btn.classList.add('visible');
-                    } else {
-                        btn.classList.remove('visible');
-                    }
-                    // Update progress
-                    updateProgress();
-                }, { passive: true });
-
-                btn.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            }
-
-            // ─── READING PROGRESS ──────────────────────────────────────────────────
-            function updateProgress() {
-                const scrollTop = window.scrollY || window.pageYOffset;
-                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-                if (docHeight > 0) {
-                    const progress = Math.min(100, (scrollTop / docHeight) * 100);
-                    DOM.progressBar.style.width = progress + '%';
-                }
-            }
-
-            // ─── FULLSCREEN ────────────────────────────────────────────────────────
-            function toggleFullscreen() {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                } else {
-                    document.exitFullscreen().catch(() => {});
-                }
-            }
-
-            // ─── DOWNLOAD HTML ─────────────────────────────────────────────────────
-            function downloadHTML() {
-                const contentHtml = DOM.content.innerHTML;
-                const title = state.currentFile ? state.currentFile.name.replace(/\.[^.]+$/, '') : 'document';
-                const theme = state.theme;
-
-                // Get the current styles
-                const styles = document.querySelector('style').innerHTML;
-
-                // Build the standalone HTML
-                const standalone = `<!DOCTYPE html>
-        <html lang="en" data-theme="${theme}">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${title} · Markdown Formatter</title>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${theme === 'dark' ? 'github-dark' : 'github'}.min.css">
-            <style>
-                /* --- Copied styles --- */
-                ${styles}
-                /* --- Print overrides --- */
-                @media print {
-                    #toolbar, #toc, #toc-toggle, #back-to-top, #progress-bar,
-                    .code-header .copy-btn, .no-print { display: none !important; }
-                    #app { display: block !important; }
-                    #content { padding: 20px 40px !important; max-width: 100% !important; background: #fff !important; color: #000 !important; }
-                    #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 { color: #000 !important; }
-                    #content a { color: #000 !important; border-bottom: 1px solid #000 !important; }
-                    #content pre { background: #f5f5f5 !important; border: 1px solid #ddd !important; }
-                    #content code:not(pre code) { background: #f5f5f5 !important; border: 1px solid #ddd !important; color: #d63384 !important; }
-                    #content table th { background: #f0f0f0 !important; }
-                    #content table td { border-bottom: 1px solid #ddd !important; }
-                    #content blockquote { background: #f8f8f8 !important; border-left-color: #333 !important; }
-                    #content .table-wrapper { border: 1px solid #ddd !important; }
-                    #content img { border: 1px solid #ddd !important; }
-                    body { background: #fff !important; }
-                    #content .task-list-item input[type="checkbox"] { accent-color: #000 !important; }
-                    .code-header { background: #f0f0f0 !important; border-bottom: 1px solid #ddd !important; }
-                    .code-header .lang { color: #555 !important; }
-                    #main { display: block !important; }
-                    #toc { display: none !important; }
-                    #empty-state { display: none !important; }
-                    #app.visible { display: block !important; }
-                }
-                /* --- Ensure content is visible --- */
-                #app { display: flex; flex-direction: column; min-height: 100vh; }
-                #content { flex: 1; padding: 40px 32px 80px; background: var(--bg-content); max-width: 100%; }
-                #content .content-inner { max-width: var(--max-width); margin: 0 auto; }
-                #main { display: flex; flex: 1; }
-                /* --- Fix for standalone --- */
-                body { margin: 0; background: var(--bg-page); color: var(--text-primary); font-family: var(--font-sans); }
-                .code-header .copy-btn { display: none; }
-            </style>
-        </head>
-        <body>
-            <div id="app" class="visible">
-                <div id="main">
-                    <main id="content">
-                        <div class="content-inner">
-                            ${contentHtml}
-                        </div>
-                    </main>
-                </div>
-            </div>
-            <script>
-                // Re-apply highlight.js for code blocks
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('pre code').forEach(function(block) {
-                        if (typeof hljs !== 'undefined') {
-                            hljs.highlightElement(block);
-                        }
-                    });
-                });
-            <\/script>
-        </body>
-        </html>`;
-
-                const blob = new Blob([standalone], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = title + '.html';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('HTML downloaded successfully!', 'success');
-            }
-
-            // ─── LOAD FILE ─────────────────────────────────────────────────────────
-            async function loadFile(file) {
-                const validation = validateFile(file);
-                if (!validation.valid) {
-                    showToast(validation.error, 'error');
-                    return;
-                }
-
-                try {
-                    const content = await readFileAsText(file);
-                    state.currentFile = file;
-                    state.currentContent = content;
-
-                    // Parse
-                    const html = parseMarkdown(content);
-                    state.currentHtml = html;
-
-                    // Update UI
-                    DOM.fileName.textContent = file.name;
-                    DOM.fileInfo.innerHTML =
-                        `<strong>${file.name}</strong> · ${formatFileSize(file.size)}`;
-
-                    // Show app, hide empty state
-                    DOM.emptyState.style.display = 'none';
-                    DOM.app.classList.add('visible');
-
-                    // Render
-                    renderDocument(html, content);
-
-                    // Statistics
-                    const stats = calculateStats(content, html);
-                    updateStats(stats);
-
-                    // Reset scroll
-                    window.scrollTo({ top: 0, behavior: 'instant' });
-
-                    showToast(`Loaded "${file.name}"`, 'success');
-
-                } catch (err) {
-                    console.error(err);
-                    showToast('Error loading file: ' + err.message, 'error');
-                }
-            }
-
-            // ─── SAMPLE MARKDOWN ──────────────────────────────────────────────────
-            const SAMPLE_MARKDOWN = `# Git Commands
+          } finally {
+            if (requestId === loadRequestId) setLoading(false);
+          }
+        }
+
+        // ─── SAMPLE MARKDOWN ──────────────────────────────────────────────────
+        const SAMPLE_MARKDOWN = `# Git Commands
 
     A comprehensive guide to essential Git commands for daily development.
 
@@ -2045,6 +2474,18 @@
 
     Resets the current HEAD to a specified state.
 
+    \`\`\`bash
+    git reset --soft HEAD~1
+
+    # Keep changes in staging
+    git reset --mixed HEAD~1
+
+    # Keep changes unstaged
+    git reset --hard HEAD~1
+
+    # Discard changes entirely
+    \`\`\`
+
     | Command | Effect |
     |---------|--------|
     | \`git reset --soft HEAD~1\` | Keep changes in staging |
@@ -2108,159 +2549,150 @@
     For more information, visit the [official Git documentation](https://git-scm.com/doc).
     `;
 
-            // ─── LOAD EXAMPLE ──────────────────────────────────────────────────────
-            function loadExample() {
-                const blob = new Blob([SAMPLE_MARKDOWN], { type: 'text/markdown' });
-                const file = new File([blob], 'git-commands.md', { type: 'text/markdown' });
-                loadFile(file);
+        // ─── LOAD EXAMPLE ──────────────────────────────────────────────────────
+        function loadExample() {
+          const file = new File([dedent(SAMPLE_MARKDOWN)], "git-commands.md", {
+            type: "text/markdown",
+          });
+          loadFile(file);
+        }
+
+        // ─── SETUP UPLOAD ─────────────────────────────────────────────────────
+        function clearDropFeedback() {
+          DOM.dropZone.classList.remove("dragover", "invalid");
+          DOM.dropHint.classList.add("hidden");
+        }
+
+        function updateDropFeedback(e) {
+          const files = e.dataTransfer.files;
+          const bad =
+            files.length > 0 &&
+            Array.prototype.some.call(files, (f) => !isMarkdownFile(f));
+          DOM.dropZone.classList.toggle("invalid", bad);
+          DOM.dropHint.textContent = bad
+            ? "Markdown files only"
+            : "Drop Markdown file to open";
+          DOM.dropHint.classList.remove("hidden");
+        }
+
+        function setupUpload() {
+          DOM.chooseBtn.addEventListener("click", () => DOM.fileInput.click());
+
+          DOM.reuploadBtn.addEventListener("click", () =>
+            DOM.fileInputToolbar.click(),
+          );
+
+          DOM.fileInput.addEventListener("change", (e) => {
+            if (e.target.files.length > 0) loadFile(e.target.files[0]);
+            e.target.value = "";
+          });
+
+          DOM.fileInputToolbar.addEventListener("change", (e) => {
+            if (e.target.files.length > 0) loadFile(e.target.files[0]);
+            e.target.value = "";
+          });
+
+          const dropZone = DOM.dropZone;
+          let dragDepth = 0;
+
+          dropZone.addEventListener("dragenter", (e) => {
+            e.preventDefault();
+            dragDepth++;
+            dropZone.classList.add("dragover");
+            updateDropFeedback(e);
+          });
+
+          dropZone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropZone.classList.add("dragover");
+            updateDropFeedback(e);
+          });
+
+          dropZone.addEventListener("dragleave", (e) => {
+            e.preventDefault();
+            dragDepth = Math.max(0, dragDepth - 1);
+            if (dragDepth === 0) clearDropFeedback();
+          });
+
+          dropZone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dragDepth = 0;
+            clearDropFeedback();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) loadFile(files[0]);
+          });
+
+          DOM.exampleBtn.addEventListener("click", loadExample);
+        }
+
+        // ─── SETUP KEYBOARD SHORTCUTS ─────────────────────────────────────────
+        function setupKeyboardShortcuts() {
+          document.addEventListener("keydown", (e) => {
+            if (e.ctrlKey && e.key === "o") {
+              e.preventDefault();
+              if (DOM.app.classList.contains("visible")) {
+                DOM.fileInputToolbar.click();
+              } else {
+                DOM.fileInput.click();
+              }
             }
-
-            // ─── SETUP UPLOAD ─────────────────────────────────────────────────────
-            function setupUpload() {
-                // Choose file button
-                DOM.chooseBtn.addEventListener('click', () => {
-                    DOM.fileInput.click();
-                });
-
-                // Re-upload button
-                DOM.reuploadBtn.addEventListener('click', () => {
-                    DOM.fileInputToolbar.click();
-                });
-
-                // File input change
-                DOM.fileInput.addEventListener('change', (e) => {
-                    if (e.target.files.length > 0) {
-                        loadFile(e.target.files[0]);
-                    }
-                    e.target.value = '';
-                });
-
-                DOM.fileInputToolbar.addEventListener('change', (e) => {
-                    if (e.target.files.length > 0) {
-                        loadFile(e.target.files[0]);
-                    }
-                    e.target.value = '';
-                });
-
-                // Drag & Drop
-                const dropZone = DOM.dropZone;
-
-                ['dragenter', 'dragover'].forEach((evt) => {
-                    dropZone.addEventListener(evt, (e) => {
-                        e.preventDefault();
-                        dropZone.classList.add('dragover');
-                    });
-                });
-
-                ['dragleave', 'drop'].forEach((evt) => {
-                    dropZone.addEventListener(evt, (e) => {
-                        e.preventDefault();
-                        dropZone.classList.remove('dragover');
-                    });
-                });
-
-                dropZone.addEventListener('drop', (e) => {
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0) {
-                        loadFile(files[0]);
-                    }
-                });
-
-                // Example button
-                DOM.exampleBtn.addEventListener('click', loadExample);
+            if (e.ctrlKey && e.shiftKey && (e.key === "d" || e.key === "D")) {
+              e.preventDefault();
+              toggleTheme();
             }
+          });
+        }
 
-            // ─── SETUP KEYBOARD SHORTCUTS ─────────────────────────────────────────
-            function setupKeyboardShortcuts() {
-                document.addEventListener('keydown', (e) => {
-                    // Ctrl+O: Open file
-                    if (e.ctrlKey && e.key === 'o') {
-                        e.preventDefault();
-                        if (DOM.app.classList.contains('visible')) {
-                            DOM.fileInputToolbar.click();
-                        } else {
-                            DOM.fileInput.click();
-                        }
-                    }
-                    // Ctrl+Shift+D: Toggle theme
-                    if (e.ctrlKey && e.shiftKey && (e.key === 'd' || e.key === 'D')) {
-                        e.preventDefault();
-                        toggleTheme();
-                    }
-                    // Ctrl+P: Print (browser default, we add print CSS)
-                    // No need to override
-                });
+        // ─── SETUP EVENT HANDLERS ──────────────────────────────────────────────
+        function setupThemeToggle() {
+          DOM.themeToggle.addEventListener("click", toggleTheme);
+        }
+
+        function setupFullscreen() {
+          DOM.fullscreenBtn.addEventListener("click", toggleFullscreen);
+          document.addEventListener("fullscreenchange", updateFullscreenButton);
+          updateFullscreenButton();
+        }
+
+        function setupDownload() {
+          DOM.downloadBtn.addEventListener("click", downloadHTML);
+        }
+
+        function setupTocToggle() {
+          DOM.tocToggle.addEventListener("click", toggleTOCMobile);
+          DOM.tocOverlay.addEventListener("click", () => {
+            closeTOCMobile();
+            DOM.tocToggle.focus();
+          });
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && DOM.tocNav.classList.contains("open")) {
+              closeTOCMobile();
+              DOM.tocToggle.focus();
             }
+          });
+        }
 
-            // ─── SETUP THEME TOGGLE ──────────────────────────────────────────────
-            function setupThemeToggle() {
-                DOM.themeToggle.addEventListener('click', toggleTheme);
-            }
+        // ─── INIT ──────────────────────────────────────────────────────────────
+        function init() {
+          loadTheme();
+          setupUpload();
+          setupThemeToggle();
+          setupFullscreen();
+          setupDownload();
+          setupTocToggle();
+          setupBackToTop();
+          setupKeyboardShortcuts();
 
-            // ─── SETUP FULLSCREEN ─────────────────────────────────────────────────
-            function setupFullscreen() {
-                DOM.fullscreenBtn.addEventListener('click', toggleFullscreen);
-                document.addEventListener('fullscreenchange', () => {
-                    DOM.fullscreenBtn.textContent = document.fullscreenElement ? '⛶' : '⛶';
-                });
-            }
+          console.log("📄 Markdown Formatter ready");
+        }
 
-            // ─── SETUP DOWNLOAD ────────────────────────────────────────────────────
-            function setupDownload() {
-                DOM.downloadBtn.addEventListener('click', downloadHTML);
-            }
-
-            // ─── SETUP TOC TOGGLE ─────────────────────────────────────────────────
-            function setupTocToggle() {
-                DOM.tocToggle.addEventListener('click', toggleTOCMobile);
-                DOM.tocOverlay.addEventListener('click', closeTOCMobile);
-                // Close on escape key
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && DOM.tocNav.classList.contains('open')) {
-                        closeTOCMobile();
-                    }
-                });
-            }
-
-            // ─── SETUP MUTATION OBSERVER FOR DYNAMIC CONTENT ─────────────────────
-            function setupMutationObserver() {
-                // Observe content changes to re-apply copy buttons and highlighting
-                const observer = new MutationObserver(() => {
-                    // Re-apply copy buttons if they were removed
-                    setupCopyButtons();
-                });
-                observer.observe(DOM.content, { childList: true, subtree: true });
-            }
-
-            // ─── INIT ──────────────────────────────────────────────────────────────
-            function init() {
-                loadTheme();
-                setupUpload();
-                setupThemeToggle();
-                setupFullscreen();
-                setupDownload();
-                setupTocToggle();
-                setupBackToTop();
-                setupKeyboardShortcuts();
-                setupMutationObserver();
-
-                // Show initial empty state
-                DOM.emptyState.style.display = 'flex';
-                DOM.app.classList.remove('visible');
-
-                // If there's a file in the URL hash? No, we don't support that.
-
-                console.log('📄 Markdown Formatter ready');
-            }
-
-            // ─── RUN ──────────────────────────────────────────────────────────────
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-
-        })();
+        // ─── RUN ──────────────────────────────────────────────────────────────
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", init);
+        } else {
+          init();
+        }
+      })();
     </script>
-</body>
+  </body>
 </html>

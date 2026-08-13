@@ -1131,27 +1131,159 @@ A---B---C  main
 
 ### `git push --force-with-lease`
 
-- **What it does:** Force-pushes, but refuses if the remote branch has commits you haven't seen yet (i.e., someone else pushed since your last fetch).
+- **What it does:** Force-pushes your local branch when a normal push is rejected because you rewrote its history. Unlike `--force`, Git first checks that the remote branch is still at the commit you expect. If the remote branch has changed unexpectedly, the push is rejected instead of overwriting those newer commits.
+
 - **How to use it:**
   ```bash
   git push --force-with-lease origin feature/login
   ```
-- **Example output:**
+
+- **Example scenario:** You rebased your feature branch.
+
+  **Before the rebase:**
+
   ```text
-  $ git push --force-with-lease origin feature/login
-  ...
+  Remote:
+  A---B---C
+           ↑
+      feature/login
+  ```
+
+  **After rebasing locally:**
+
+  ```text
+  Local:
+  A---B---D---E
+               ↑
+          feature/login
+  ```
+
+  A normal push fails because your rewritten history is no longer a fast-forward update:
+
+  ```bash
+  git push origin feature/login
+  ```
+
+  **Example output:**
+
+  ```text
+  ! [rejected]        feature/login -> feature/login (non-fast-forward)
+  error: failed to push some refs
+  ```
+
+  Since you intentionally rewrote the history, use:
+
+  ```bash
+  git push --force-with-lease origin feature/login
+  ```
+
+  If the remote branch is still at `C`, the push succeeds:
+
+  ```text
+  Before:
+
+  Remote: A---B---C
+  Local:  A---B---D---E
+
+  After:
+
+  Remote: A---B---D---E
+                         ↑
+                    feature/login
+  ```
+
+  **Example output:**
+
+  ```text
    + 9f3a1b2...d4e5f6g feature/login -> feature/login (forced update)
   ```
-  (A `+` and "(forced update)" indicate history was rewritten on the remote.)
-- **After:** The remote branch now matches your rewritten local history.
-- **Result:** Your rewritten feature branch is uploaded — safely, because Git confirmed no one else pushed since your last fetch.
-- **When to use it:** Pushing after rewriting history (e.g., `rebase` or `commit --amend`) on a branch you're confident you "own," such as your own feature branch.
-- **Common mistake:** Pushing with plain `--force` clobbers a teammate's unseen work silently. `--force-with-lease` refuses instead:
+
+- **What the `--lease` check protects you from:** Suppose someone else pushed a new commit after your last fetch:
+
+  ```text
+  Remote:
+  A---B---C---F
+              ↑
+        teammate's commit
+
+  Local:
+  A---B---D---E
+               ↑
+        your rewritten branch
+  ```
+
+  Your local repository still expects the remote branch to be at `C`.
+
+  Running:
+
+  ```bash
+  git push --force-with-lease origin feature/login
+  ```
+
+  causes Git to reject the push because the remote branch has moved:
+
   ```text
   ! [rejected]        feature/login -> feature/login (stale info)
+  error: failed to push some refs
   ```
-- **When NOT to use it:** Never on a shared branch (like `main`) where others may be building on top of history you're rewriting.
-- **Important notes:** ⚠️ Still overwrites remote history — just safer than plain `--force` because it won't silently clobber a teammate's unseen work. See the [force vs. force-with-lease comparison](#12-important-comparisons) below.
+
+  This prevents your force-push from blindly replacing the remote history containing `F`.
+
+- **Difference from `--force`:**
+
+  ```text
+  git push --force
+
+  Replace the remote branch with my local history.
+  ```
+
+  ```text
+  git push --force-with-lease
+
+  Replace the remote branch with my local history,
+  but only if the remote is still where I expect it to be.
+  ```
+
+- **When to use it:** Use it when you intentionally rewrote history on a branch you control, such as after:
+
+  ```bash
+  git rebase
+  git commit --amend
+  git reset
+  ```
+
+  A common workflow is:
+
+  ```bash
+  git fetch origin
+  git rebase origin/main
+  git log --oneline --graph
+  git push --force-with-lease origin feature/login
+  ```
+
+- **When NOT to use it:** Avoid rewriting history on shared branches such as `main` or `develop` unless your team's workflow explicitly allows it.
+
+  To safely undo a commit that has already been shared, prefer:
+
+  ```bash
+  git revert <commit-hash>
+  ```
+
+- **Common mistake:** Thinking `--force-with-lease` is completely safe. It is **safer than `--force`**, but it still rewrites remote history when the push succeeds.
+
+- **After a successful push:**
+
+  ```text
+  Local:
+  A---B---D---E
+
+  Remote:
+  A---B---D---E
+  ```
+
+  The remote branch now matches your rewritten local branch.
+
+- **Important notes:** ⚠️ `--force-with-lease` protects against certain unexpected remote updates, but it does not make force-pushing harmless. Always understand which remote history you are replacing before using it.
 
 ### Tracking Branches & Upstream
 

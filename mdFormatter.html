@@ -826,6 +826,199 @@
         background: var(--bg-upload-hover);
       }
 
+      /* ----- Alerts / Callouts, front matter, footnotes, math, mermaid ----- */
+      #content .md-front-matter {
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        background: var(--bg-code);
+        border: 1px dashed var(--border-color);
+        border-radius: var(--radius);
+        padding: var(--space-3) var(--space-4);
+        margin: 0 0 1.2em 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        position: relative;
+        transition:
+          background var(--transition),
+          border-color var(--transition);
+      }
+      #content .md-front-matter::before {
+        display: block;
+        font-family: var(--font-sans);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        content: attr(data-type);
+        margin-bottom: 6px;
+      }
+
+      #content mark {
+        background: var(--bg-mark, #fef9c3);
+        color: var(--text-primary);
+        border-radius: 3px;
+        padding: 0 2px;
+      }
+      [data-theme="dark"] #content mark {
+        background: #423d1f;
+      }
+
+      #content blockquote.md-alert {
+        border-left-width: 4px;
+        border-radius: var(--radius);
+        padding: 12px 16px;
+        position: relative;
+      }
+      #content blockquote.md-alert::before {
+        display: block;
+        font-family: var(--font-sans);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 4px;
+        color: var(--text-secondary);
+        content: attr(data-alert);
+      }
+      #content blockquote.md-alert-note {
+        background: var(--bg-alert-note, #eef5fd);
+        border-left-color: var(--text-link);
+      }
+      #content blockquote.md-alert-tip {
+        background: var(--bg-alert-tip, #eaf6ee);
+        border-left-color: var(--text-success);
+      }
+      #content blockquote.md-alert-important {
+        background: var(--bg-alert-important, #f6edfb);
+        border-left-color: #8250df;
+      }
+      #content blockquote.md-alert-warning {
+        background: var(--bg-alert-warning, #fdf3e0);
+        border-left-color: #d29922;
+      }
+      #content blockquote.md-alert-caution {
+        background: var(--bg-alert-caution, #fbebeb);
+        border-left-color: var(--text-danger);
+      }
+      [data-theme="dark"] #content blockquote.md-alert-note {
+        background: rgba(88, 166, 255, 0.08);
+      }
+      [data-theme="dark"] #content blockquote.md-alert-tip {
+        background: rgba(63, 185, 80, 0.08);
+      }
+      [data-theme="dark"] #content blockquote.md-alert-important {
+        background: rgba(130, 80, 223, 0.12);
+      }
+      [data-theme="dark"] #content blockquote.md-alert-warning {
+        background: rgba(210, 153, 34, 0.1);
+      }
+      [data-theme="dark"] #content blockquote.md-alert-caution {
+        background: rgba(248, 81, 73, 0.1);
+      }
+
+      #content .footnotes {
+        margin-top: 2.4em;
+        padding-top: 1em;
+        border-top: 1px solid var(--border-color);
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        transition: border-color var(--transition);
+      }
+      #content .footnotes h2 {
+        font-size: 1.1em;
+        margin: 0 0 0.6em;
+        border-bottom: none;
+      }
+      #content .footnotes ol {
+        margin: 0;
+        padding-left: 1.5em;
+      }
+      #content .footnotes li {
+        margin-bottom: 0.4em;
+      }
+      #content .footref {
+        font-size: 0.75em;
+        vertical-align: super;
+        line-height: 0;
+        color: var(--text-link);
+        text-decoration: none;
+        border-bottom: none;
+        padding: 0 1px;
+      }
+      #content .footref-back {
+        color: var(--text-muted);
+        text-decoration: none;
+        border-bottom: none;
+      }
+
+      #content .math {
+        color: var(--text-primary);
+      }
+      #content .math-block {
+        margin: 1.2em 0;
+        text-align: center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 2px 0;
+      }
+      #content .math-block .katex-display {
+        margin: 0;
+      }
+      #content .math-marker {
+        background: transparent;
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+      }
+      #content .math-marker.math-display {
+        display: inline-block;
+      }
+
+      #content .mermaid-holder {
+        margin: 1.2em 0;
+        padding: var(--space-5);
+        background: var(--bg-content);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        overflow-x: auto;
+        text-align: center;
+        font-family: var(--font-sans);
+        font-size: 13px;
+        color: var(--text-secondary);
+        min-height: 60px;
+        transition:
+          background var(--transition),
+          border-color var(--transition);
+      }
+      #content .mermaid-holder svg {
+        max-width: 100%;
+        height: auto;
+      }
+      #content .mermaid-holder.mermaid-error {
+        font-family: var(--font-mono);
+        white-space: pre;
+        text-align: left;
+        color: var(--text-code-block);
+        background: var(--bg-code);
+      }
+
+      #content table th[align="center"],
+      #content table td[align="center"] {
+        text-align: center;
+      }
+      #content table th[align="right"],
+      #content table td[align="right"] {
+        text-align: right;
+      }
+
+      #content li.task-done,
+      #content .task-done {
+        text-decoration: line-through;
+        color: var(--text-muted);
+      }
+
       /* ----- Back to Top ----- */
       #back-to-top {
         position: fixed;
@@ -1350,6 +1543,113 @@
         const HLJS_SCRIPT =
           "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js";
 
+        const KATEX_CSS =
+          "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css";
+        const KATEX_JS =
+          "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js";
+        const MERMAID_JS =
+          "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js";
+
+        // GitHub-style emoji shortcodes (subset of common ones)
+        const EMOJI = {
+          rocket: "🚀",
+          warning: "⚠️",
+          white_check_mark: "✅",
+          x: "❌",
+          bulb: "💡",
+          bug: "🐛",
+          fire: "🔥",
+          tada: "🎉",
+          sparkles: "✨",
+          heart: "❤️",
+          bookmark: "🔖",
+          key: "🔑",
+          lock: "🔒",
+          unlock: "🔓",
+          eyes: "👀",
+          zap: "⚡",
+          memo: "📝",
+          book: "📖",
+          page_facing_up: "📄",
+          package: "📦",
+          pushpin: "📌",
+          hourglass: "⏳",
+          alarm_clock: "⏰",
+          thinking: "🤔",
+          raised_hands: "🙌",
+          thumbsup: "👍",
+          thumbsdown: "👎",
+          clap: "👏",
+          loudspeaker: "📢",
+          flag: "🚩",
+          checkered_flag: "🏁",
+          trophy: "🏆",
+          medal: "🏅",
+          star: "⭐",
+          dizzy: "💫",
+          construction: "🚧",
+          warning_sign: "⚠️",
+          question: "❓",
+          exclamation: "❗",
+          grey_question: "❔",
+          grey_exclamation: "❕",
+          chart_with_upwards_trend: "📈",
+          bar_chart: "📊",
+          scroll: "📜",
+          hammer: "🔨",
+          wrench: "🔧",
+          link: "🔗",
+          paperclip: "📎",
+          scissors: "✂️",
+          telephone: "☎️",
+          email: "✉️",
+          mailbox: "📫",
+          hourglass_flowing_sand: "⏳",
+          stopwatch: "⏱️",
+          calendar: "📅",
+          clock3: "🕒",
+          soon: "🔜",
+          interrobang: "⁉️",
+          heavy_check_mark: "✔️",
+          heavy_multiplication_x: "✖️",
+          arrow_right: "➡️",
+          arrow_left: "⬅️",
+          arrow_up: "⬆️",
+          arrow_down: "⬇️",
+          arrow_backward: "◀️",
+          arrow_forward: "▶️",
+        };
+
+        // ─── ON-DEMAND LOADER HELPERS ────────────────────────────────────────
+        function injectScript(src) {
+          return new Promise((resolve, reject) => {
+            const existing = document.querySelector('script[data-src="' + src + '"]');
+            if (existing) return resolve();
+            const s = document.createElement("script");
+            s.dataset.src = src;
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = function () {
+              reject(new Error("Could not load " + src));
+            };
+            document.head.appendChild(s);
+          });
+        }
+
+        function injectStyle(href) {
+          if (document.querySelector('link[data-href="' + href + '"]')) return;
+          const l = document.createElement("link");
+          l.rel = "stylesheet";
+          l.dataset.href = href;
+          l.href = href;
+          document.head.appendChild(l);
+        }
+
+        let mermaidCounter = 0;
+        function nextMermaidId() {
+          return "mermaid-" + (++mermaidCounter);
+        }
+
         // ─── STATE ─────────────────────────────────────────────────────────────
         const state = {
           currentFile: null,
@@ -1361,6 +1661,9 @@
             headings: 0,
             codeBlocks: 0,
           },
+          mathLatex: [],
+          mathSpans: [],
+          mermaidBlocks: [],
         };
 
         let loadRequestId = 0;
@@ -1475,6 +1778,15 @@
           if (hljsLink) {
             hljsLink.href = theme === "dark" ? HLJS_DARK : HLJS_LIGHT;
           }
+
+          // Re-render Mermaid diagrams with the new theme if already loaded
+          if (
+            state.mermaidBlocks &&
+            state.mermaidBlocks.length &&
+            window.mermaid
+          ) {
+            renderMermaid();
+          }
         }
 
         function toggleTheme() {
@@ -1560,6 +1872,113 @@
         }
 
         // ─── MARKDOWN PROCESSING ──────────────────────────────────────────────
+        // Replace leading YAML/TOML/JSON front matter with a styled div.
+        function extractFrontMatter(text) {
+          const yaml = /^---\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/.exec(text);
+          if (yaml) {
+            return {
+              html:
+                '<div class="md-front-matter" data-type="YAML front matter">' +
+                escapeHtml(yaml[1].trim()) +
+                "</div>",
+              rest: text.slice(yaml[0].length),
+            };
+          }
+          const toml = /^\+\+\+\r?\n([\s\S]*?)\r?\n\+\+\+\s*(?:\r?\n|$)/.exec(text);
+          if (toml) {
+            return {
+              html:
+                '<div class="md-front-matter" data-type="TOML front matter">' +
+                escapeHtml(toml[1].trim()) +
+                "</div>",
+              rest: text.slice(toml[0].length),
+            };
+          }
+          const json = /^(\{[\s\S]*?\})\s*(?:\r?\n|$)/.exec(text);
+          if (json) {
+            try {
+              JSON.parse(json[1]);
+              return {
+                html:
+                  '<div class="md-front-matter" data-type="JSON front matter">' +
+                  escapeHtml(json[1]) +
+                  "</div>",
+                rest: text.slice(json[0].length),
+              };
+            } catch (e) {
+              // Not valid JSON, treat as normal markdown.
+            }
+          }
+          return { html: "", rest: text };
+        }
+
+        // Protect code spans/fences, then pull out $..$ and $$..$$ math into
+        // placeholder tokens so Marked never treats `$` as anything special.
+        function extractMath(text) {
+          state.mathLatex = [];
+          // 1. Protect fenced code blocks and inline code spans so `$` inside
+          //    code is never interpreted as math.
+          const protectedChunks = [];
+          let idx = 0;
+          text = text.replace(
+            /```[\s\S]*?```|`[^`\n]*`/g,
+            function (m) {
+              protectedChunks.push(m);
+              return "\u0001MD" + idx++ + "\u0001";
+            },
+          );
+          // 2. Extract display math $$...$$ (reluctant; must terminate).
+          //    Escaped `\$` is never treated as a delimiter.
+          text = text.replace(
+            /(?<!\\)\$\$([\s\S]+?)\$\$/g,
+            function (m, inner) {
+              const n = state.mathLatex.length;
+              state.mathLatex.push({ latex: inner.trim(), display: true });
+              return "⟦math:" + n + "⟧";
+            },
+          );
+          // 3. Extract inline math $...$.
+          text = text.replace(
+            /(?<!\\)\$(?!\s)([^$\n]+?)(?<!\s)\$(?!\$)/g,
+            function (m, inner) {
+              const n = state.mathLatex.length;
+              state.mathLatex.push({ latex: inner, display: false });
+              return "⟦math:" + n + "⟧";
+            },
+          );
+          // 4. Restore protected chunks.
+          text = text.replace(/\u0001MD(\d+)\u0001/g, function (m, i) {
+            return protectedChunks[Number(i)];
+          });
+          return text;
+        }
+
+        // Register the ==highlight== extension used by some renderers.
+        if (typeof marked !== "undefined") {
+          const markExtension = {
+            name: "mark",
+            level: "inline",
+            start: function (src) {
+              return src.indexOf("==");
+            },
+            tokenizer: function (src) {
+              const rule = /^==([^=\n]+?)(?<! )==(?!=)/;
+              const match = rule.exec(src);
+              if (match) {
+                return {
+                  type: "mark",
+                  raw: match[0],
+                  text: match[1],
+                };
+              }
+            },
+            renderer: function (token) {
+              return "<mark>" + token.text + "</mark>";
+            },
+          };
+          marked.use({ extensions: [markExtension] });
+        }
+
         function parseMarkdown(text) {
           try {
             marked.setOptions({
@@ -1567,12 +1986,16 @@
               breaks: true,
               pedantic: false,
             });
-            const rawHtml = marked.parse(text);
-            // Pipeline: Markdown → Marked → HTML → DOMPurify → DOM → Highlight.js
-            return DOMPurify.sanitize(rawHtml, {
+            const fm = extractFrontMatter(text);
+            const mathText = extractMath(fm.rest);
+            const rawHtml = marked.parse(mathText);
+            const withFm = fm.html + rawHtml;
+            // Pipeline: Markdown → Marked → HTML → DOMPurify → DOM → post-processing
+            return DOMPurify.sanitize(withFm, {
               USE_PROFILES: { html: true },
               ADD_ATTR: ["target"],
               ADD_TAGS: ["input"],
+              ADD_DATA_URI_TAGS: ["img"],
             });
           } catch (err) {
             console.error("Parse error:", err);
@@ -1631,6 +2054,11 @@
 
         // ─── RENDER ────────────────────────────────────────────────────────────
         function renderDocument(html) {
+          // NOTE: state.mathLatex is populated during parseMarkdown (extractMath)
+          // and must NOT be cleared here.
+          state.mathSpans = [];
+          state.mermaidBlocks = [];
+
           DOM.markdownContent.replaceChildren();
           DOM.markdownContent.innerHTML = html;
 
@@ -1649,8 +2077,33 @@
             if (img.complete && img.naturalWidth === 0) mark();
           });
 
-          // Highlight + wrap code blocks
+          // Alerts → styled callouts; footnotes → real footnotes section
+          postProcessAlerts();
+          postProcessFootnotes();
+
+          // ==mark== handled by the marked extension; attribute lists on
+          // headings apply their #id before TOC generation.
+          applyAttributeLists();
+
+          // Replace math placeholders with markers and render KaTeX on demand
+          replaceMathPlaceholders();
+
+          // Convert emoji shortcodes in text nodes (skip code/pre/markers)
+          replaceEmojiShortcodes();
+
+          // Highlight + wrap code blocks; skip mermaid (rendered separately)
           DOM.markdownContent.querySelectorAll("pre code").forEach((block) => {
+            if (block.classList.contains("language-mermaid")) {
+              const pre = block.parentElement;
+              const holder = document.createElement("div");
+              holder.className = "mermaid-holder";
+              holder.setAttribute("role", "img");
+              const graph = block.textContent;
+              block.replaceChildren();
+              pre.replaceWith(holder);
+              state.mermaidBlocks.push({ holder, graph });
+              return;
+            }
             try {
               hljs.highlightElement(block);
             } catch (e) {
@@ -1669,16 +2122,344 @@
             }
           });
 
-          // Task-list styling
+          // Task-list styling + interactivity
           DOM.markdownContent
             .querySelectorAll('input[type="checkbox"]')
             .forEach((cb) => {
               const li = cb.closest("li");
               if (li) li.classList.add("task-list-item");
+              cb.disabled = false;
+              const toggle = () =>
+                li && li.classList.toggle("task-done", cb.checked);
+              cb.addEventListener("change", toggle);
+              toggle();
             });
+
+          // Render math + mermaid (async, on-demand CDN loading)
+          renderMath();
+          renderMermaid();
 
           generateTOC();
           setupCopyButtons();
+        }
+
+        // ─── POST-PROCESSING (ALERTS, FOOTNOTES, MATH, EMOJI, ATTR LISTS) ────
+        const ALERT_TYPES = {
+          NOTE: "note",
+          TIP: "tip",
+          IMPORTANT: "important",
+          WARNING: "warning",
+          CAUTION: "caution",
+        };
+
+        function postProcessAlerts() {
+          DOM.markdownContent.querySelectorAll("blockquote").forEach((bq) => {
+            const firstP = bq.querySelector(":scope > p");
+            if (!firstP) return;
+            const m = /^\s*\[!([A-Z]+)\]\s*/.exec(firstP.textContent);
+            if (m && ALERT_TYPES[m[1]]) {
+              const type = ALERT_TYPES[m[1]];
+              bq.classList.add("md-alert", "md-alert-" + type);
+              bq.setAttribute("data-alert", m[1].toLowerCase());
+              // Remove the "[!NOTE]" prefix from the first paragraph
+              firstP.textContent = firstP.textContent
+                .slice(m[0].length)
+                .replace(/^\s*/, "");
+            }
+          });
+        }
+
+        function postProcessFootnotes() {
+          const defs = new Map();
+          const defPattern = /^\[\^([^\]]+)\]:\s?([\s\S]*)$/;
+
+          // Collect top-level footnote definition paragraphs
+          Array.prototype.slice
+            .call(DOM.markdownContent.children)
+            .forEach((el) => {
+              if (el.tagName !== "P") return;
+              const m = defPattern.exec(el.textContent);
+              if (m && m[2].trim()) {
+                defs.set(m[1], m[2]);
+                el.remove();
+              }
+            });
+
+          if (defs.size === 0) return;
+
+          // Replace [^id] references with superscript footnote links
+          const counter = {};
+          const walker = document.createTreeWalker(
+            DOM.markdownContent,
+            NodeFilter.SHOW_TEXT,
+            {
+              acceptNode(node) {
+                // Skip code, math markers, sup already generated
+                const parent = node.parentElement;
+                if (
+                  parent &&
+                  parent.closest("pre, code, .math-marker, sup.footref")
+                )
+                  return NodeFilter.FILTER_REJECT;
+                return /\[\^[^\]\n]+\]/.test(node.nodeValue)
+                  ? NodeFilter.FILTER_ACCEPT
+                  : NodeFilter.FILTER_REJECT;
+              },
+            },
+          );
+          const textNodes = [];
+          while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+          textNodes.forEach((node) => {
+            const parts = node.nodeValue.split(/(\[\^[^\]\n]+\])/);
+            if (parts.length === 1) return;
+            const fragment = document.createDocumentFragment();
+            parts.forEach((part) => {
+              const ref = /^\[\^([^\]\n]+)\]$/.exec(part);
+              if (ref && defs.has(ref[1])) {
+                counter[ref[1]] = (counter[ref[1]] || 0) + 1;
+                const id = "fn-" + ref[1] + "-" + counter[ref[1]];
+                const sup = document.createElement("a");
+                sup.className = "footref";
+                sup.href = "#fn-def-" + ref[1];
+                sup.dataset.fn = ref[1];
+                sup.title = defs.get(ref[1]);
+                sup.textContent = counter[ref[1]];
+                fragment.appendChild(sup);
+              } else {
+                fragment.appendChild(document.createTextNode(part));
+              }
+            });
+            node.parentNode.replaceChild(fragment, node);
+          });
+
+          // Build the footnotes section at the end of the document
+          const section = document.createElement("div");
+          section.className = "footnotes";
+          const title = document.createElement("h2");
+          title.textContent = "Footnotes";
+          section.appendChild(title);
+          const list = document.createElement("ol");
+          Array.from(defs.entries()).forEach(([id, text]) => {
+            const li = document.createElement("li");
+            const anchor = document.createElement("a");
+            anchor.href = "#fn-" + id + "-1";
+            anchor.id = "fn-def-" + id;
+            li.appendChild(anchor);
+            // Render the footnote body as inline markdown is complex; keep
+            // the raw text but bold/italic/code via light inline render.
+            const body = document.createElement("span");
+            body.textContent = "";
+            body.innerHTML = renderInlineMd(text);
+            li.appendChild(body);
+            const back = document.createElement("a");
+            back.className = "footref-back";
+            back.href = "#fn-" + id + "-1";
+            back.textContent = " ↩";
+            li.appendChild(back);
+            list.appendChild(li);
+          });
+          section.appendChild(list);
+          DOM.markdownContent.appendChild(section);
+        }
+
+        function renderInlineMd(text) {
+          let s = String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+          s = s
+            .replace(/`([^`\n]+)`/g, function (m, c) {
+              return "<code>" + c + "</code>";
+            })
+            .replace(/\*\*([^*\n]+)\*\*/g, function (m, c) {
+              return "<strong>" + c + "</strong>";
+            })
+            .replace(/\*([^*\n]+)\*/g, function (m, c) {
+              return "<em>" + c + "</em>";
+            })
+            .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, t, u) {
+              return '<a href="' + u + '">' + t + "</a>";
+            });
+          return s;
+        }
+
+        function applyAttributeLists() {
+          DOM.markdownContent
+            .querySelectorAll("h1, h2, h3, h4, h5, h6")
+            .forEach((h) => {
+              const m = h.textContent.match(/(\s*)\{#([^}]+)\}\s*$/);
+              if (m) {
+                h.id = m[2].trim();
+                const keep = h.textContent.slice(
+                  0,
+                  h.textContent.length - m[0].length,
+                );
+                h.textContent = keep.trimEnd();
+              }
+            });
+        }
+
+        // ─── MATH RENDERING ───────────────────────────────────────────────────
+        function replaceMathPlaceholders() {
+          const markerRe = /⟦math:(\d+)⟧/g;
+          const walker = document.createTreeWalker(
+            DOM.markdownContent,
+            NodeFilter.SHOW_TEXT,
+            {
+              acceptNode(node) {
+                markerRe.lastIndex = 0;
+                return markerRe.test(node.nodeValue)
+                  ? NodeFilter.FILTER_ACCEPT
+                  : NodeFilter.FILTER_REJECT;
+              },
+            },
+          );
+          const textNodes = [];
+          while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+          textNodes.forEach((node) => {
+            const parts = node.nodeValue.split(/⟦math:(\d+)⟧/);
+            // When splitting with a capture group, [text, n, text, n, text...]
+            const hasMarker = parts.length > 1;
+            if (!hasMarker) return;
+            const fragment = document.createDocumentFragment();
+            let hasDisplay = false;
+            for (let i = 0; i < parts.length; i++) {
+              if (i % 2 === 1) {
+                const info = state.mathLatex[Number(parts[i])];
+                if (info && info.display) hasDisplay = true;
+                const span = document.createElement("span");
+                span.className =
+                  "math-marker" +
+                  (info && info.display ? " math-display" : "");
+                span.textContent = info ? info.latex : "⟦math:" + parts[i] + "⟧";
+                if (info) span.dataset.latex = info.latex;
+                span.dataset.math = parts[i];
+                fragment.appendChild(span);
+                state.mathSpans.push(span);
+              } else if (parts[i]) {
+                fragment.appendChild(document.createTextNode(parts[i]));
+              }
+            }
+            // If this text node's paragraph held only a display-math marker,
+            // promote the paragraph to a block .math-block container so KaTeX
+            // display mode renders as its own centered block.
+            const parent = node.parentNode;
+            const next = node.nextSibling;
+            parent.removeChild(node);
+            parent.insertBefore(fragment, next);
+            if (
+              hasDisplay &&
+              parent.tagName === "P" &&
+              parent.childNodes.length === 1 &&
+              parent.firstChild.classList &&
+              parent.firstChild.classList.contains("math-display")
+            ) {
+              const div = document.createElement("div");
+              div.className = "math-block";
+              while (parent.firstChild) div.appendChild(parent.firstChild);
+              parent.parentNode.replaceChild(div, parent);
+            }
+          });
+        }
+
+        async function renderMath() {
+          if (state.mathSpans.length === 0) return;
+          try {
+            injectStyle(KATEX_CSS);
+            await injectScript(KATEX_JS);
+            const spans = state.mathSpans;
+            spans.forEach((span) => {
+              const info = state.mathLatex[Number(span.dataset.math)];
+              if (!info || typeof window.katex === "undefined") return;
+              try {
+                window.katex.render(info.latex, span, {
+                  displayMode: !!(info.display && span.classList.contains("math-display")),
+                  throwOnError: false,
+                  trust: false,
+                });
+              } catch (err) {
+                // Leave the raw LaTeX visible on render failure.
+              }
+            });
+          } catch (err) {
+            // Offline: leave the LaTeX source text visible.
+            console.warn("KaTeX failed to load:", err);
+          }
+        }
+
+        // ─── MERMAID RENDERING ─────────────────────────────────────────────────
+        async function renderMermaid() {
+          if (state.mermaidBlocks.length === 0) return;
+          try {
+            await injectScript(MERMAID_JS);
+            const blocks = state.mermaidBlocks;
+            blocks.forEach((block) => {
+              const holder = block.holder;
+              holder.textContent = "Rendering diagram…";
+            });
+            window.mermaid.initialize({
+              startOnLoad: false,
+              theme: state.theme === "dark" ? "dark" : "default",
+              securityLevel: "loose",
+            });
+            const blocks2 = state.mermaidBlocks;
+            for (const block of blocks2) {
+              try {
+                const renderId = nextMermaidId();
+                const { svg } = await window.mermaid.render(
+                  renderId,
+                  block.graph.trim(),
+                );
+                block.holder.innerHTML = svg;
+              } catch (err) {
+                block.holder.textContent = block.graph;
+                block.holder.classList.add("mermaid-error");
+                console.warn("Mermaid render failed:", err);
+              }
+            }
+          } catch (err) {
+            state.mermaidBlocks.forEach((block) => {
+              block.holder.textContent = block.graph;
+              block.holder.classList.add("mermaid-error");
+            });
+            console.warn("Mermaid failed to load:", err);
+          }
+        }
+
+        // ─── EMOJI SHORTCODES ─────────────────────────────────────────────────
+        function replaceEmojiShortcodes() {
+          const walker = document.createTreeWalker(
+            DOM.markdownContent,
+            NodeFilter.SHOW_TEXT,
+            {
+              acceptNode(node) {
+                const parent = node.parentElement;
+                if (
+                  parent &&
+                  parent.closest("pre, code, .math-marker, .kbd, .mermaid-holder")
+                )
+                  return NodeFilter.FILTER_REJECT;
+                return /:[A-Za-z0-9_+]+:/.test(node.nodeValue)
+                  ? NodeFilter.FILTER_ACCEPT
+                  : NodeFilter.FILTER_REJECT;
+              },
+            },
+          );
+          const textNodes = [];
+          while (walker.nextNode()) textNodes.push(walker.currentNode);
+          textNodes.forEach((node) => {
+            const replaced = node.nodeValue.replace(
+              /:([A-Za-z0-9_+]+):/g,
+              function (m, key) {
+                return EMOJI[key] || m;
+              },
+            );
+            if (replaced !== node.nodeValue) {
+              node.nodeValue = replaced;
+            }
+          });
         }
 
         // ─── CODE BLOCKS ───────────────────────────────────────────────────────
@@ -2047,6 +2828,10 @@
     --text-code: #d63384; --text-code-block: #1f2937;
     --border-color: #e5e7eb; --border-focus: #2563eb;
     --radius: 8px; --transition: 0.2s ease;
+    --bg-mark: #fef9c3;
+    --bg-alert-note: #eef5fd; --bg-alert-tip: #eaf6ee;
+    --bg-alert-important: #f6edfb; --bg-alert-warning: #fdf3e0;
+    --bg-alert-caution: #fbebeb;
 }
 [data-theme="dark"] {
     --bg-page: #0d1117; --bg-content: #161b22; --bg-code: #1c2333; --bg-code-block: #1c2333;
@@ -2134,6 +2919,83 @@ code:not(pre code) {
     border: 1px solid var(--border-color);
     white-space: nowrap;
 }
+mark {
+    background: var(--bg-mark);
+    color: var(--text-primary);
+    border-radius: 3px;
+    padding: 0 2px;
+}
+.md-front-matter {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    background: var(--bg-code);
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 0 0 1.2em;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.md-front-matter::before {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    content: attr(data-type);
+    margin-bottom: 6px;
+}
+blockquote.md-alert {
+    border-left-width: 4px;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+blockquote.md-alert::before {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+    content: attr(data-alert);
+}
+blockquote.md-alert-note { background: var(--bg-alert-note); border-left-color: var(--text-link); }
+blockquote.md-alert-tip { background: var(--bg-alert-tip); border-left-color: var(--text-success); }
+blockquote.md-alert-important { background: var(--bg-alert-important); border-left-color: #8250df; }
+blockquote.md-alert-warning { background: var(--bg-alert-warning); border-left-color: #d29922; }
+blockquote.md-alert-caution { background: var(--bg-alert-caution); border-left-color: var(--text-danger); }
+.footnotes {
+    margin-top: 2.4em;
+    padding-top: 1em;
+    border-top: 1px solid var(--border-color);
+    font-size: 13.5px;
+    color: var(--text-secondary);
+}
+.footnotes h2 { font-size: 1.1em; margin: 0 0 0.6em; border-bottom: none; }
+.footnotes ol { margin: 0; padding-left: 1.5em; }
+.footnotes li { margin-bottom: 0.4em; }
+.footref { font-size: 0.75em; vertical-align: super; line-height: 0; color: var(--text-link); text-decoration: none; padding: 0 1px; }
+.footref-back { color: var(--text-muted); text-decoration: none; }
+.math-block { margin: 1.2em 0; text-align: center; overflow-x: auto; }
+.math-marker { background: transparent; color: var(--text-secondary); font-family: var(--font-mono); }
+.mermaid-holder {
+    margin: 1.2em 0;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow-x: auto;
+    text-align: center;
+}
+.mermaid-holder svg { max-width: 100%; height: auto; }
+.mermaid-holder.mermaid-error { font-family: var(--font-mono); white-space: pre; text-align: left; }
+th[align="center"], td[align="center"] { text-align: center; }
+th[align="right"], td[align="right"] { text-align: right; }
+li.task-done, .task-done { text-decoration: line-through; color: var(--text-muted); }
 pre blockquote code:not(pre code) { background: var(--bg-code); }
 .code-header {
     display: flex;
@@ -2176,6 +3038,7 @@ table tbody tr:nth-child(even) { background: var(--bg-table-stripe); }
 
         function downloadHTML() {
           const contentHtml = DOM.markdownContent.innerHTML;
+          const usesMath = contentHtml.indexOf("katex") !== -1;
           const rawTitle = state.currentFile
             ? state.currentFile.name.replace(/\.[^.]+$/, "")
             : "document";
@@ -2190,6 +3053,7 @@ table tbody tr:nth-child(even) { background: var(--bg-table-stripe); }
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${safeTitle} · Markdown Formatter</title>
     <link rel="stylesheet" href="${theme === "dark" ? HLJS_DARK : HLJS_LIGHT}">
+    ${usesMath ? '<link rel="stylesheet" href="' + KATEX_CSS + '">' : ""}
     ${getExportStyles()}
 </head>
 <body>
@@ -2206,6 +3070,8 @@ ${contentHtml}
             });
         });
     <\/script>
+    ${usesMath ? '<script src="' + KATEX_JS + '"><\/script>' : ""}
+    ${usesMath ? "<script>window.addEventListener('load', function(){ if (window.katex) { document.querySelectorAll('.math-marker').forEach(function(el){ var tex = el.textContent; try { if (el.classList.contains('math-display')) { katex.render(tex, el, { displayMode: true, throwOnError: false }); } else { el.removeAttribute('class'); katex.render(tex, el, { displayMode: false, throwOnError: false }); } } catch(e){} }); } });<\/script>" : ""}
 </body>
 </html>`;
 
@@ -2221,7 +3087,9 @@ ${contentHtml}
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
           showToast(
-            "HTML downloaded (internet needed for highlighting)",
+            usesMath
+              ? "HTML downloaded (needs internet for math & highlighting)"
+              : "HTML downloaded (internet needed for highlighting)",
             "success",
           );
         }

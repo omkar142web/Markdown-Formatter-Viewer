@@ -1,5 +1,3 @@
-
-
 # Markdown Formatter Stress Test
 
 This file is designed to test **Markdown rendering and formatting support**.
